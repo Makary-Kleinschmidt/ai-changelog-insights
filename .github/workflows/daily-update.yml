@@ -1,5 +1,8 @@
 name: Real-Time AI Changelog Update
 on:
+  push:
+    branches:
+      - main
   schedule:
     # Run at 23:55 UTC to capture the full day's events
     - cron: '55 23 * * *'
