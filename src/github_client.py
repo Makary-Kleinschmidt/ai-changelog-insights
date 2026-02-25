@@ -76,9 +76,9 @@ def yield_active_ai_repos(days_lookback=3) -> Iterator[Dict]:
     start_date = datetime.now(timezone.utc) - timedelta(days=days_lookback)
     start_date_str = start_date.strftime("%Y-%m-%d")
     
-    # Query: Updated recently, High Stars
+    # Query: Updated recently, High Stars, Decent Forks (Quality Filter)
     # We remove 'sort=updated' and use 'sort=stars' to find the GIANTS that updated recently
-    query = f"topic:ai language:python pushed:>={start_date_str} stars:>500"
+    query = f"topic:ai language:python pushed:>={start_date_str} stars:>500 forks:>50"
     
     page = 0
     seen_repos = set(config.VIP_REPOS) # Don't re-yield VIPs

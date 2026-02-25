@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>AI Changelog Insights</title>
+  <link>https://ai-changelog-insights.github.io</link>
+  <description>Daily AI updates, summarized for developers.</description>
+  <atom:link href="https://ai-changelog-insights.github.io/feed.xml" rel="self" type="application/rss+xml" />
+  <language>en-us</language>
+  <lastBuildDate>Wed, 25 Feb 2026 17:29:15 GMT</lastBuildDate>
+  
+  <item>
+    <title>langchain - langchain-core 1.2.16 Release</title>
+    <link>https://github.com/langchain-ai/langchain</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release fixes tool chunk ID handling and improves merge functionality in langchain-core.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Fix empty tool chunk IDs</strong>: Treats empty tool chunk IDs as missing during merge operations, preventing potential errors in tool execution workflows.</li>
+<li><strong>Improved merge functionality</strong>: Enhances the merge operation to handle tool chunk IDs more robustly, ensuring better consistency in tool call processing.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from langchain_core.tools import Tool
+# No specific code changes needed - this is a bug fix that improves existing functionality</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">langchain-ai/langchain-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>anthropic-sdk-python - Version 0.84.0</title>
+    <link>https://github.com/anthropics/anthropic-sdk-python</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces MCP (Model Context Protocol) conversion helpers, removes the publishing section from the CLI target, and changes the array format to brackets. It also includes internal improvements and documentation updates.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>MCP Conversion Helpers</strong>: New helpers for converting MCP tools, prompts, and resources make it easier to integrate with the Model Context Protocol.</li>
+<li><strong>Array Format Change</strong>: Changed array_format to brackets for better compatibility and consistency.</li>
+<li><strong>CLI Target Cleanup</strong>: Removed the publishing section from the CLI target to streamline the interface.</li>
+<li><strong>Internal Improvements</strong>: Enhanced SSE classes with request options and made proxy environment variable tests more resilient.</li>
+<li><strong>Documentation Update</strong>: Rebranded to Claude SDK and streamlined the README for better clarity.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from anthropic import Anthropic
+client = Anthropic()
+# Use new MCP conversion helpers
+# Example: convert_mcp_tool(tool) is now available</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">anthropics/anthropic-sdk-python-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>ragflow - v0.24.0</title>
+    <link>https://github.com/infiniflow/ragflow</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>RAGFlow 0.24.0 introduces Memory API, knowledge base governance, and Agent chat history management, addressing core challenges in real-world deployments.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Memory Management</strong>: Adds Memory extraction log display and APIs/SDK for developer integration, enabling intelligent retrieval, session management, and CRUD operations.</li>
+<li><strong>Agent Chat Management</strong>: Launches a new Chat-like interface that retains Sessions and dialogue history, improving Agent usability.</li>
+<li><strong>Knowledge Base Governance</strong>: Supports batch management of Metadata and renames 'ToC' to 'PageIndex', enhancing user experience for configuring application metadata.</li>
+<li><strong>Multi-Sandbox Mechanism</strong>: Introduces support for local gVisor and Alibaba Cloud Sandboxes with compatibility for mainstream Sandbox APIs.</li>
+<li><strong>Enhanced Chat Features</strong>: Adds 'Thinking' mode, removes 'Reasoning' option, and optimizes retrieval strategies for deep-research scenarios.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from ragflow import Memory
+# Create a new Memory
+memory = Memory.create(name="my_memory")
+# Add an entry
+memory.add_entry(content="This is a test memory entry")
+# Retrieve memories
+memories = Memory.search(keyword="test")</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">infiniflow/ragflow-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>mindsdb - v26.0.0 Release</title>
+    <link>https://github.com/mindsdb/mindsdb</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release brings significant improvements across SQL capabilities, integrations, and Knowledge Bases, along with numerous bug fixes and enhancements for better performance and reliability.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>SQL Enhancements</strong>: Fixed GROUP BY WITH ROLLUP for reliability, added validation for MINDSDB_DB_CON env variable, made track_column case-insensitive, improved SQL parsing, and enhanced memory handling with DuckDB and Snowflake.</li>
+<li><strong>Integration Improvements</strong>: Updated handlers for Shopify, Confluence, Databrick, Hubspot, and Netsuite; deprecated Dspy, Chromedb, and ML handlers; added images to README files; and improved validation for Shopify targets.</li>
+<li><strong>Knowledge Base Updates</strong>: Switched default Knowledge Base store in Docker-compose to pgvector, fixed mixed case column display, resolved ID duplicates, and enabled batch inserts by default.</li>
+<li><strong>Bug Fixes and Improvements</strong>: Resolved issues with README locations, language permissions, Shopify query limits, and various other reported bugs for enhanced stability.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-sql">SELECT * FROM mindsdb.predictors WHERE name = 'your_model';</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">mindsdb/mindsdb-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>agno - v2.5.5 - Slack Interface and ModelsLab Enhancements</title>
+    <link>https://github.com/agno-agi/agno</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces real-time streaming responses in Slack with live progress cards, multi-bot support with separate tokens and signing secrets, and completes the ModelsLab media suite with image generation capabilities.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Slack Interface Real-time Streaming</strong>: Responses now stream in real-time with live progress cards for tool calls, reasoning, and workflow steps, providing better visibility into agent operations directly in Slack.</li>
+<li><strong>Multi-Bot Slack Support</strong>: Each Slack instance can now use its own token and signing_secret, enabling multiple bots to operate on the same server with separate configurations.</li>
+<li><strong>ModelsLab Image Generation</strong>: Extended ModelsLabTools to support image generation via ModelsLab's text-to-image API, completing the full ModelsLab media suite (text, audio, and now images).</li>
+<li><strong>Gemini API Empty Message Fix</strong>: Fixed empty message parts causing request failures when sending conversations to the Gemini API, improving reliability.</li>
+<li><strong>AWS Bedrock Tool Result Merging</strong>: Merge consecutive toolResult blocks into single user message, providing cleaner output formatting.</li>
+<li><strong>Workflow Image Handling</strong>: Handle raw image bytes in workflow step's _convert_image_artifacts_to_images, improving image processing capabilities.</li>
+<li><strong>Knowledge Filter Serialization</strong>: Serialize FilterExpr objects in GET /agents and /teams responses, improving API consistency.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python"># Slack Interface with Real-time Streaming
+from agno import Agent, SlackInterface
+
+# Configure Slack with separate token and signing_secret
+slack_interface = SlackInterface(
+    token="your-slack-bot-token",
+    signing_secret="your-signing-secret"
+)
+
+# Create agent with Slack interface
+agent = Agent(
+    name="slack-agent",
+    interfaces=[slack_interface]
+)
+
+# Start agent - responses will now stream with live progress cards
+agent.run()</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">agno-agi/agno-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>datasets - 4.6.0</title>
+    <link>https://github.com/huggingface/datasets</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>Enhanced support for multimedia data types in Lance datasets, including images, videos, and audio, with improved deduplication and faster uploads.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Multimedia Type Support</strong>: Lance datasets now support Image, Video, and Audio types, enabling richer data handling and inference from blob types.</li>
+<li><strong>Video Push to Hub</strong>: Added support for pushing video datasets to Hugging Face Hub, simplifying the sharing of video data.</li>
+<li><strong>Cross-Format Deduplication</strong>: Improved upload and download speeds by reusing binary chunks across formats (Lance, WebDataset, Parquet) for images, audio, and video.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from datasets import load_dataset
+# Load a Lance dataset with video support
+ds = load_dataset("lance-format/Openvid-1M", streaming=True, split="train")
+print(ds.features)
+
+# Push a video dataset to Hugging Face Hub
+from datasets import Dataset, Video
+ds = Dataset.from_dict({"video": ["path/to/video.mp4"]})
+ds = ds.cast_column("video", Video())
+ds.push_to_hub("username/my-video-dataset")</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">huggingface/datasets-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>ComfyUI - v0.15.0</title>
+    <link>https://github.com/Comfy-Org/ComfyUI</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>ComfyUI v0.15.0 introduces essential subgraph blueprints, text generation support, and various performance and bug fixes.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Essential Subgraph Blueprints</strong>: Adds 24 non-cloud essential blueprints covering common workflows including text/image/video generation, image editing, inpainting/outpainting, upscaling, and more.</li>
+<li><strong>Text Generation Support</strong>: Basic text generation support with native models, initially supporting Gemma3, with improvements for Qwen 3 compatibility.</li>
+<li><strong>Performance Optimizations</strong>: Limits return of requants to fix performance of some fp8 dynamic_vram workflows and adds a simple 3-band equalizer node for audio.</li>
+<li><strong>API Nodes Enhancements</strong>: Adds ElevenLabs nodes and fixes for Gemini API responses, including uncompressed image returns and MIME type matching.</li>
+<li><strong>UI Improvements</strong>: Marks 429 widgets as advanced for collapsible UI and adds essentials_category for better organization.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from diffusers import StableDiffusionPipeline
+pipe = StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2")
+image = pipe("a photo of a cat").images[0]</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">Comfy-Org/ComfyUI-2026-02-24</guid>
+    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>docling - v2.75.0</title>
+    <link>https://github.com/docling-project/docling</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>Docling v2.75.0 introduces XBRL instance report parsing, unified model-family inference engines with KServe v2 API support, and various bug fixes.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>XBRL Instance Report Parser</strong>: Adds backend parser for XBRL instance reports, enabling structured financial data extraction from XBRL files.</li>
+<li><strong>Unified Model-Family Inference Engines</strong>: Introduces unified inference engines for image classification and KServe v2 API support, improving model deployment and inference capabilities.</li>
+<li><strong>ASR Segment Length Validation</strong>: Skips ASR segments with zero length, preventing processing of empty audio segments and improving robustness.</li>
+<li><strong>DOCX Hyperlink Address Guard</strong>: Guards against None hyperlink addresses in DOCX parsing, preventing crashes when processing documents with missing hyperlink targets.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from docling import Docling
+
+# Parse XBRL instance report
+document = Docling().parse("financial_report.xbrl")
+
+# Use unified inference engines
+from docling.engine import ImageClassificationEngine
+engine = ImageClassificationEngine()
+result = engine.predict(image_path="image.jpg")</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">docling-project/docling-2026-02-24</guid>
+    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>letta - v0.16.5</title>
+    <link>https://github.com/letta-ai/letta</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>Version bump to 0.16.5 with no functional changes - purely a version increment.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Version Bump</strong>: This release increments the version number to 0.16.5 but contains no functional changes or new features.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-bash">pip install letta==0.16.5</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">letta-ai/letta-2026-02-24</guid>
+    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+</channel>
+</rss>

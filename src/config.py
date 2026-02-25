@@ -30,31 +30,31 @@ Input CHANGELOG:
 
 Instructions:
 1.  **Identify Updates**: Check if there is an entry strictly matching {target_date}.
-    -   If YES: Summarize it.
-    -   If NO: Output ONLY "NO_UPDATE" (do not explain, do not summarize older entries).
-2.  **Analyze Impact**: For each major change (Feature, Fix, Breaking), explain:
-    -   **What it means**: Translate technical jargon into plain English.
-    -   **Why it matters**: How does this improve the developer experience or application performance?
-    -   **Actionable Step**: Provide a concrete thing for the user to try.
+    -   If NO: Output ONLY the JSON: `{{"update_found": false}}`.
+    -   If YES: Extract the update details and format as JSON.
+2.  **Analyze Impact**:
+    -   **What's New**: A concise summary of the update.
+    -   **Why It Matters**: A list of key changes with their impact.
+    -   **Try It Out**: A code snippet or command to use the new feature.
 
-**IMPORTANT**: 
-- Do NOT state "No update found for {target_date}" in your summary. 
-- Do NOT mention "The latest entry is..." or "This release is from...".
-- Just present the content of the update as if it is fresh news.
-- Start directly with the "What's New" content.
-
-Output Format (Markdown):
-
-### 🚀 What's New
-[Concise summary of the update content]
-
-### 💡 Why It Matters
-- **[Feature/Fix Name]**: [Explanation of impact]
-- **[Feature/Fix Name]**: [Explanation of impact]
-
-### 🛠️ Try It Out
-[Code snippet or command to use the new feature, if applicable]
-
----
-If NO entry is found for {target_date}, output ONLY: "NO_UPDATE".
+Output Format (JSON):
+{{
+  "update_found": true,
+  "title": "Release Title or Version",
+  "summary": "Concise summary of what is new...",
+  "impact": [
+    {{
+      "name": "Feature Name",
+      "description": "Why it matters..."
+    }},
+    {{
+      "name": "Another Feature",
+      "description": "Impact explanation..."
+    }}
+  ],
+  "try_it_out": {{
+    "language": "python",
+    "code": "print('Hello World')"
+  }}
+}}
 """
