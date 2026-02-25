@@ -10,15 +10,47 @@ GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
 
 # VIP Repositories to always check
 VIP_REPOS = [
+    # Agents & Frameworks
     "All-Hands-AI/OpenHands",
     "Significant-Gravitas/AutoGPT",
     "langchain-ai/langchain",
+    "langchain-ai/langgraph",
     "run-llama/llama_index",
+    "microsoft/autogen",
+    "microsoft/Semantic-Kernel",
+    "crewAIInc/crewAI",
+    "agno-agi/agno",
+    "infiniflow/ragflow",
+
+    # Models & Inference
+    "ollama/ollama",
+    "vllm-project/vllm",
+    "ggerganov/llama.cpp",
     "huggingface/transformers",
+    "huggingface/peft",
+    "huggingface/diffusers",
+    "pytorch/pytorch",
+    
+    # SDKs
     "anthropics/anthropic-sdk-python",
     "google/generative-ai-python",
-    "microsoft/autogen",
-    "crewAIInc/crewAI"
+    "openai/openai-python",
+    
+    # Tools & UI
+    "open-webui/open-webui",
+    "AUTOMATIC1111/stable-diffusion-webui",
+    "Comfy-Org/ComfyUI",
+    "gradio-app/gradio",
+    "streamlit/streamlit",
+    
+    # Vector DBs & Data
+    "chroma-core/chroma",
+    "qdrant/qdrant",
+    "huggingface/datasets",
+    
+    # Audio/Video/Other
+    "openai/whisper",
+    "ultralytics/ultralytics"
 ]
 
 # Actionable Insights Prompt
