@@ -61,19 +61,27 @@
                                 // Fallback for non-secure contexts (e.g. file:// or http://)
                                 const textArea = document.createElement('textarea');
                                 textArea.value = textToCopy;
+                                
+                                // Make it part of the DOM but invisible
                                 textArea.style.position = 'fixed';
-                                textArea.style.left = '-9999px';
+                                textArea.style.left = '0';
                                 textArea.style.top = '0';
+                                textArea.style.opacity = '0';
+                                textArea.style.pointerEvents = 'none';
+                                
                                 document.body.appendChild(textArea);
                                 textArea.focus();
                                 textArea.select();
+                                
                                 try {
-                                    document.execCommand('copy');
+                                    const successful = document.execCommand('copy');
+                                    if (!successful) throw new Error('Copy command failed');
                                 } catch (err) {
                                     console.error('Fallback copy failed', err);
-                                    throw new Error('Copy failed');
+                                    throw err;
+                                } finally {
+                                    document.body.removeChild(textArea);
                                 }
-                                document.body.removeChild(textArea);
                             }
 
                             // Success feedback
@@ -213,6 +221,9 @@
     </header>
     
     <main>
+        {% if global_summary %}
+            {{ global_summary }}
+        {% endif %}
         {% if repos %}
             {% for repo in repos %}
             <article class="repo-card">

@@ -94,3 +94,76 @@ def check_for_daily_update(content: str, target_date: str) -> dict:
     except Exception as e:
         print(f"Error calling OpenRouter: {e}")
         return None
+
+def generate_global_summary(repos_data: list) -> dict:
+    """
+    Generates a high-level summary of all updates, looking for synergies and issues.
+    """
+    if not repos_data:
+        return None
+        
+    api_key = os.getenv('OPENROUTER_API_KEY') or config.OPENROUTER_API_KEY
+    if not api_key:
+        return None
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://ai-changelog-insights.github.io",
+        "X-Title": "AI Changelog Insights"
+    }
+
+    # Prepare input data
+    updates_json = []
+    for repo in repos_data:
+        updates_json.append({
+            "name": repo.get('name'),
+            "summary": (repo.get('title') or '') + ": " + (repo.get('description') or '')
+        })
+    
+    prompt = config.GLOBAL_SUMMARY_PROMPT.format(
+        updates_json=json.dumps(updates_json, indent=2)
+    )
+
+    payload = {
+        "model": config.REWRITE_MODEL,
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a Senior AI Ecosystem Analyst that outputs strict JSON."
+            },
+            {
+                "role": "user", 
+                "content": prompt
+            }
+        ],
+        "temperature": 0.3,
+        "response_format": {"type": "json_object"},
+        "max_tokens": 1500
+    }
+    
+    try:
+        response = requests.post(
+            config.OPENROUTER_BASE_URL + "/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=60
+        )
+        response.raise_for_status()
+        
+        choices = response.json().get("choices", [])
+        if not choices:
+            return None
+            
+        result_text = choices[0]["message"]["content"].strip()
+        
+        if result_text.startswith("```json"):
+            result_text = result_text[7:-3].strip()
+        elif result_text.startswith("```"):
+            result_text = result_text[3:-3].strip()
+            
+        return json.loads(result_text)
+        
+    except Exception as e:
+        print(f"Error generating global summary: {e}")
+        return None

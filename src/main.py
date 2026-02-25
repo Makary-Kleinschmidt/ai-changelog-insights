@@ -8,10 +8,37 @@ import argparse
 
 try:
     from github_client import yield_active_ai_repos
-    from summarizer import check_for_daily_update
+    from summarizer import check_for_daily_update, generate_global_summary
 except ImportError:
     from src.github_client import yield_active_ai_repos
-    from src.summarizer import check_for_daily_update
+    from src.summarizer import check_for_daily_update, generate_global_summary
+
+def format_global_summary_html(data: dict) -> str:
+    """
+    Formats the global summary JSON into HTML.
+    """
+    html = []
+    
+    html.append(f"<div class='global-summary-card'>")
+    html.append(f"<h2>🌍 Daily Ecosystem Report</h2>")
+    html.append(f"<p class='ecosystem-overview'>{data.get('ecosystem_summary', '')}</p>")
+    
+    if data.get('synergies'):
+        html.append(f"<h3>🔗 Synergies & Connections</h3>")
+        html.append("<ul>")
+        for item in data['synergies']:
+            html.append(f"<li><strong>{item.get('title')}</strong>: {item.get('description')}</li>")
+        html.append("</ul>")
+        
+    if data.get('potential_issues'):
+        html.append(f"<h3>⚠️ Potential Issues & Conflicts</h3>")
+        html.append("<ul>")
+        for item in data['potential_issues']:
+            html.append(f"<li><strong>{item.get('title')}</strong>: {item.get('description')}</li>")
+        html.append("</ul>")
+        
+    html.append("</div>")
+    return "\n".join(html)
 
 def format_summary_html(data: dict) -> str:
     """
@@ -180,8 +207,15 @@ def generate_site(target_date_str: str = None):
         print(f"ℹ️ Filling {needed} slots with older updates...")
         final_repos.extend(secondary_list[:needed])
 
-    # 2. Generate HTML
+    # 2. Generate Global Summary
     print(f"🎨 Generating dashboard with {len(final_repos)} updates...")
+    
+    global_summary_html = ""
+    if final_repos:
+        print("🧠 Generating global ecosystem analysis...")
+        global_summary_data = generate_global_summary(final_repos)
+        if global_summary_data:
+             global_summary_html = format_global_summary_html(global_summary_data)
     
     try:
         with open("site/template.html", "r", encoding="utf-8") as f:
@@ -191,6 +225,7 @@ def generate_site(target_date_str: str = None):
             title="AI Changelog Insights",
             date=target_date_str,
             repos=final_repos,
+            global_summary=global_summary_html,
             generated_at=datetime.now(timezone.utc).strftime("%H:%M UTC")
         )
         

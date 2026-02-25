@@ -329,3 +329,39 @@ footer {
     .repo-card { padding: 1rem; }
     .copy-btn { opacity: 1; } /* Always show on mobile since no hover */
 }
+
+/* Global Summary Card */
+.global-summary-card {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(52, 152, 219, 0.05) 100%);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+}
+
+.global-summary-card h2 {
+    margin-top: 0;
+    color: var(--accent);
+    font-size: 1.8rem;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.global-summary-card h3 {
+    margin-top: 1.5rem;
+    color: var(--primary);
+    font-size: 1.3rem;
+}
+
+.ecosystem-overview {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text);
+}
+
+[data-theme="dark"] .global-summary-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(52, 152, 219, 0.1) 100%);
+}

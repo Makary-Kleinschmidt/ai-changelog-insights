@@ -69,3 +69,36 @@ Output Format (JSON):
   }}
 }}
 """
+
+GLOBAL_SUMMARY_PROMPT = """You are a Senior AI Ecosystem Analyst.
+Your task is to analyze a collection of daily updates from major AI libraries/tools and identify cross-cutting themes, synergies, and potential conflicts.
+
+Updates for today:
+{updates_json}
+
+Instructions:
+1.  **Analyze Synergies**: Look for connections between updates.
+    -   Did multiple libraries add support for the same model (e.g., Llama 3)?
+    -   Are there complementary features (e.g., LangChain adds a tool that AutoGPT can use)?
+2.  **Identify Potential Issues**:
+    -   Are there breaking changes in a core library (like `transformers`) that might affect dependent libraries (like `langchain` or `llama_index`)?
+    -   Are there conflicting dependency requirements?
+3.  **Synthesize**: Create a high-level summary of the day's AI ecosystem.
+
+Output Format (JSON):
+{{
+  "synergies": [
+    {{
+      "title": "Unified Model Support",
+      "description": "Both LangChain and LlamaIndex added support for Gemini 1.5 Pro, enabling..."
+    }}
+  ],
+  "potential_issues": [
+    {{
+      "title": "Dependency Conflict Risk",
+      "description": "Transformers v4.39 introduces a breaking change in tokenization that might affect..."
+    }}
+  ],
+  "ecosystem_summary": "Today's updates focus heavily on agentic workflows..."
+}}
+"""
