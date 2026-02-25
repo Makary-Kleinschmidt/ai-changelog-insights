@@ -5,7 +5,7 @@ load_dotenv()
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-REWRITE_MODEL = "arcee-ai/trinity-large-preview:free"
+REWRITE_MODEL = "deepseek/deepseek-v3.2"
 GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
 
 # VIP Repositories to always check
