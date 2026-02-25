@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} | {{date}}</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+        
+        // Init theme
+        const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', saved);
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="title-group">
+                <h1>{{title}}</h1>
+                <p class="subtitle">Daily AI Updates for <span class="highlight">{{date}}</span></p>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                🌗
+            </button>
+        </div>
+    </header>
+    
+    <main>
+        {% if repos %}
+            {% for repo in repos %}
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="{{repo.url}}" target="_blank">{{repo.name}}</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ {{repo.stars}}</span>
+                    </div>
+                </div>
+                <p class="repo-description">{{repo.description}}</p>
+                <div class="changelog-summary">
+                    {{repo.summary_html}}
+                </div>
+            </article>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No significant changelog updates found for today yet.</p>
+                <p class="sub-text">Check back later or view yesterday's archives.</p>
+            </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>Generated at {{generated_at}} • Powered by OpenRouter + GitHub API</p>
+    </footer>
+</body>
+</html>

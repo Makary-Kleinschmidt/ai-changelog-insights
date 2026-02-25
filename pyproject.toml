@@ -1,0 +1,14 @@
+[project]
+name = "ai-changelog-insights"
+version = "0.1.0"
+description = "Autonomous AI Repository Changelog Insights Generator"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "jinja2>=3.1.6",
+    "markdown>=3.10.2",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
+    "PyGithub>=2.1.1",
+    "tenacity>=9.1.4",
+]
