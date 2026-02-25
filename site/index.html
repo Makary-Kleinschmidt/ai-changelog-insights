@@ -37,146 +37,342 @@
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/GreenhillEfka/pilotsuite-styx-ha" target="_blank">pilotsuite-styx-ha</a></h2>
+                    <h2><a href="https://github.com/huggingface/transformers" target="_blank">transformers</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 0</span>
+                        <span class="stars">★ 156969</span>
                     </div>
                 </div>
-                <p class="repo-description">PilotSuite — Styx: HACS Integration fuer Home Assistant. 80+ Sensoren, 15+ Dashboard Cards, 23 Core-Module, Zero-Config Setup, Multi-User Preference Learning.</p>
+                <p class="repo-description">🤗 Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training. </p>
                 <div class="changelog-summary">
-                    <ul>
-<li>chore: sync HA integration version with Core <code>v8.4.1</code> line</li>
-<li>no functional HA code changes; compatibility release for paired install tracking</li>
+                    <h3>🚀 What's New</h3>
+<p>The changelog shows updates from <strong>2026-02-16</strong> (v5.2.0), not 2026-02-25. This release includes major new model additions and several breaking changes and improvements.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>VoxtralRealtime</strong>: A new streaming speech-to-text model from Mistral AI that enables real-time transcription with low latency. This is significant for applications requiring live audio processing like virtual meetings or live captioning.</li>
+<li><strong>GLM-5 (GlmMoeDsa)</strong>: A massive 744B parameter model from zAI with enhanced reasoning, coding, and agentic capabilities. The integration of DeepSeek Sparse Attention (DSA) makes it more efficient to deploy while maintaining long-context capacity.</li>
+<li><strong>Qwen3.5</strong>: A native vision-language model with 397B total parameters but only 17B activated per forward pass, offering remarkable inference efficiency. The expanded language support (201 languages) makes it globally accessible.</li>
+<li><strong>VibeVoice Acoustic Tokenizer</strong>: A novel framework for synthesizing high-fidelity, long-form speech with multiple speakers, particularly suited for podcasts and audiobooks.</li>
 </ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-python"># Try VoxtralRealtime for streaming transcription
+from transformers import AutoProcessor, VoxtralRealtimeForConditionalGeneration
+
+processor = AutoProcessor.from_pretrained(&quot;mistralai/Voxtral-Mini-4B-Realtime-2602&quot;)
+model = VoxtralRealtimeForConditionalGeneration.from_pretrained(&quot;mistralai/Voxtral-Mini-4B-Realtime-2602&quot;, device_map=&quot;auto&quot;)
+
+# Process audio chunks as they arrive for real-time transcription
+</code></pre>
+
+<hr />
+<p><strong>Note</strong>: No changelog entry was found for 2026-02-25. The latest entry is from 2026-02-16 (v5.2.0).</p>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/GreenhillEfka/pilotsuite-styx-core" target="_blank">pilotsuite-styx-core</a></h2>
+                    <h2><a href="https://github.com/anthropics/anthropic-sdk-python" target="_blank">anthropic-sdk-python</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 0</span>
+                        <span class="stars">★ 2813</span>
                     </div>
                 </div>
-                <p class="repo-description">PilotSuite — Styx: Privacy-first lokaler KI-Assistent fuer Home Assistant. Brain Graph, Habitus Pattern Learning, Mood Engine, LLM Provider Chain, Tool-Calling, Telegram Bot, MCP Server.</p>
+                <p class="repo-description">None</p>
                 <div class="changelog-summary">
-                    <p>The changelog contains multiple entries dated 2026-02-25:</p>
-<ol>
-<li><strong>Version 8.4.1</strong> - API Recovery + Compatibility Hardening</li>
-<li>Recovered full conversation API implementation with compatibility paths</li>
-<li>Added readiness endpoint and enriched version info with "Styx" name</li>
-<li>Fixed core app import failures and dashboard/API issues</li>
-<li>
-<p>Restored backward-compatible exports</p>
-</li>
-<li>
-<p><strong>Version 8.1.1</strong> - DEV LOOP #1: Branch Sync + Test Fixes</p>
-</li>
-<li>Implemented branch sync with origin/main and RFC-Phase 2 Core Tools</li>
-<li>Expanded test suite with smoke tests and anomaly detection</li>
-<li>
-<p>Fixed HASSFest configuration</p>
-</li>
-<li>
-<p><strong>Version 8.1.0</strong> - MCP Phase 2: Web Search + Test Suite</p>
-</li>
-<li>Added new APIs: input_number, zones, scene_patterns, routine_patterns, push_notifications</li>
-<li>Updated manifest and registered all new APIs in blueprint</li>
-<li>Fixed push notifications syntax error</li>
-</ol>
-<p>The most recent entry is 8.4.1, which represents the primary update for 2026-02-25 with API recovery and compatibility hardening improvements.</p>
+                    <h3>🚀 What's New</h3>
+<p>The Anthropic SDK for Python has been updated to version 0.84.0, bringing several improvements including enhanced MCP (Model Context Protocol) tool support, better HTTP request handling, and a rebranding to "Claude SDK".</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>MCP Tool Conversion Helpers</strong>: The new conversion helpers for MCP tools, prompts, and resources make it easier to integrate and work with MCP tools in your applications, streamlining the development process for tool-based AI interactions.</li>
+<li><strong>Array Format Change to Brackets</strong>: Changing the array format to brackets improves consistency with common HTTP conventions, making API requests more predictable and easier to debug.</li>
+<li><strong>Enhanced SSE Request Options</strong>: Adding request options to SSE (Server-Sent Events) classes provides more control over streaming responses, allowing for better customization of real-time data handling.</li>
+<li><strong>Rebranding to Claude SDK</strong>: The rebranding to "Claude SDK" aligns the package name with the product, making it clearer for developers what they're working with and improving discoverability.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-python"># Example of using the new MCP conversion helpers
+from anthropic import Anthropic
+
+client = Anthropic()
+# Convert MCP tools to SDK format
+converted_tools = client.convert_mcp_tools(mcp_tools)
+
+# Use the new array format in requests
+response = client.messages.create(
+    model=&quot;claude-3-5-sonnet-20241022&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}],
+    array_format=&quot;brackets&quot;  # New format option
+)
+</code></pre>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/Peuqui/AIfred-Intelligence" target="_blank">AIfred-Intelligence</a></h2>
+                    <h2><a href="https://github.com/open-webui/open-webui" target="_blank">open-webui</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 22</span>
+                        <span class="stars">★ 124892</span>
                     </div>
                 </div>
-                <p class="repo-description">🎩 AIfred - Multi-Agent AI Assistant with TTS, RAG, Web Research & Voice capabilities. Supports Ollama, vLLM, TabbyAPI. Features AIfred/Sokrates/Salomo debate system.</p>
+                <p class="repo-description">User-friendly AI Interface (Supports Ollama, OpenAI API, ...)</p>
                 <div class="changelog-summary">
-                    <p><strong>VL Fast Path als SSOT</strong> — <code>chat_vl_direct()</code> aus <code>conversation_handler.py</code> entfernt. VL-Pfad in <code>_chat_mixin.py</code> nutzt jetzt <code>handle_own_knowledge()</code> direkt mit <code>agent="vision"</code> — kein duplizierter Inference-Code mehr. <strong><code>get_agent_num_ctx()</code> unterstützt "vision"</strong> — <code>context_utils.py</code>: <code>"vision"</code> als gültiger Agent hinzugefügt, liest <code>vision_num_ctx_enabled</code>/<code>vision_num_ctx</code> für Manual-Mode, XTTS-Reservation greift auch für VL. <strong>VL nutzte AIfred's Context statt Vision-Context</strong> — Behoben durch <code>agent="vision"</code> Routing. <strong>Toter <code>state=None</code>-Zweig in <code>handle_own_knowledge()</code></strong> — Unerreichbarer Fallback-Code mit veralteten Imports entfernt. <strong>llm_history Duplikat-Eintrag bei VL ohne Response</strong> — <code>_chat_mixin.py</code>: Längenvergleich statt Role-Check verhindert falsche AI-Response-Erkennung. <strong><code>title_num_ctx</code> hardcoded 32768 bei VL</strong> — <code>_session_mixin.py</code>: Titelgenerierung nutzt jetzt <code>get_agent_num_ctx("vision", ...)</code>, vermeidet Ollama-Modell-Reload durch Context-Mismatch. <strong>Debug-Labels zeigten "AIFRED" für VL</strong> — <code>own_knowledge_handler.py</code>: <code>agent_label</code> dynamisch (<code>AIFRED</code>/<code>VISION</code>), <code>source_label</code> zeigt <code>VL (model)</code> statt <code>Own Knowledge (model)</code>. <strong><code>cleanup_vram_cache</code> in autoscan löschte Ollama/vLLM-Kalibrierungen</strong> — Jetzt nur noch <code>backend == "llamacpp"</code> Einträge bereinigt. <strong><code>update_vram_cache</code> Schema-Mismatch</strong> — <code>llama-swap-autoscan.py</code>: fehlende Model-Level-Felder <code>quantization</code>, <code>model_size_gb</code>, <code>gguf_path</code> ergänzt. <strong>KV-Cache Anzeige <code>?</code> statt <code>f16</code></strong> — <code>llamacpp_calibration.py</code>: Zeigt jetzt <code>KV-Cache: f16</code>.</p>
+                    <h3>🚀 What's New</h3>
+<p>No update found for 2026-02-25. The latest entry is v0.8.5 from 2026-02-23.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Voice dictation shortcut</strong>: Users can now toggle voice dictation using Cmd+Shift+L (or Ctrl+Shift+L on Windows/Linux), making it faster to start and stop dictation without clicking the microphone button.</li>
+<li><strong>Model access KeyError fix</strong>: The /api/models endpoint no longer crashes with a 500 error when models have incomplete info metadata missing the user_id field (e.g. models using global default metadata).</li>
+<li><strong>Frontend initialization resilience</strong>: The app layout now gracefully handles individual API failures during initialization (getModels, getBanners, getTools, getUserSettings, setToolServers) instead of blocking the entire page load when any single call fails.</li>
+<li><strong>Backend config null safety</strong>: Language detection during app initialization no longer crashes when the backend config fetch fails, preventing a secondary cause of infinite loading.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<p>Update to v0.8.5 to benefit from these improvements.</p>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/mikhashev/dpc-messenger" target="_blank">dpc-messenger</a></h2>
+                    <h2><a href="https://github.com/Comfy-Org/ComfyUI" target="_blank">ComfyUI</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 8</span>
+                        <span class="stars">★ 104168</span>
                     </div>
                 </div>
-                <p class="repo-description">D-PC Messenger, a decentralized, Privacy-First Platform for Human-AI Collaboration.</p>
+                <p class="repo-description">The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.</p>
                 <div class="changelog-summary">
-                    <p>The changelog contains an entry dated 2026-02-25. Here is the summary:</p>
-<p><strong>D-PC Messenger 0.18.0 (2026-02-25)</strong> introduces the Embedded Autonomous AI Agent (DPC Agent) with 40+ tools, background consciousness, and self-modification capabilities. Major features include Agent Telegram Integration for two-way messaging and voice transcription, Reasoning Model Support (DPTP v1.4) with DeepSeek R1, Claude Extended Thinking, and OpenAI o1/o3, Remote Peer Inference Enhancements with provider discovery and configurable timeouts, and Real-time AI Response Streaming with token-by-token display. The release also includes Z.AI provider enhancements, Firewall improvements with granular agent permissions, UI improvements, and numerous bug fixes across voice transcription, tool handling, and configuration management.</p>
+                    <h3>🚀 What's New</h3>
+<p>ComfyUI v0.15.0 released on 2026-02-24 with significant new features including native text generation support, audio processing nodes, and enhanced API integrations.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Native Text Generation Support</strong>: Adds built-in text generation capabilities using models like Gemma3, eliminating the need for external API calls for basic text tasks</li>
+<li><strong>Audio Processing Nodes</strong>: Introduces a 3-band equalizer and GLSL shader nodes for audio and visual effects, expanding ComfyUI's multimedia capabilities</li>
+<li><strong>Enhanced API Integrations</strong>: Adds ElevenLabs nodes for text-to-speech and new ByteDance Seedream-5 model support, providing more creative options</li>
+<li><strong>Performance Optimizations</strong>: Includes fixes for fp8 dynamic_vram workflows and improved PyTorch allocator integration for better memory management</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-bash"># Update to the latest version
+pip install --upgrade comfyui
+
+# Try the new text generation node
+# Add a Gemma3 text generation node to your workflow
+</code></pre>
+
+<hr />
+<p><strong>Note</strong>: The changelog shows releases on 2026-02-24 (v0.15.0), 2026-02-18 (v0.14.2), and 2026-02-17 (v0.14.1), but no specific entry for 2026-02-25. The latest available version is v0.15.0 from 2026-02-24.</p>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/deconvolute-labs/deconvolute" target="_blank">deconvolute</a></h2>
+                    <h2><a href="https://github.com/infiniflow/ragflow" target="_blank">ragflow</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 2</span>
+                        <span class="stars">★ 73696</span>
                     </div>
                 </div>
-                <p class="repo-description">Real-time security layer protecting AI Agents from Confused Deputy attacks, malicious MCP payloads, and Indirect Prompt Injection.</p>
+                <p class="repo-description">RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capabilities to create a superior context layer for LLMs</p>
                 <div class="changelog-summary">
-                    <p>Add regression tests to track and validate changes against upstream mcp sdk</p>
+                    <h3>🚀 What's New</h3>
+<p>RAGFlow v0.24.0 introduces significant enhancements across memory management, agent capabilities, and system integrations, making it easier to build and maintain intelligent applications.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Memory Management</strong>: The new Memory extraction log display and APIs/SDK provide transparency into memory operations and enable seamless integration for CRUD operations and intelligent retrieval. This means developers can now debug memory issues more effectively and build more sophisticated conversational applications.</li>
+<li><strong>Agent Chat Management</strong>: The new Chat-like interface with session retention and multi-Sandbox support (local gVisor and Alibaba Cloud) allows for better conversation management and deployment flexibility. This improves the user experience for both developers and end-users.</li>
+<li><strong>Dataset Improvements</strong>: Batch metadata management and the renamed PageIndex feature streamline knowledge base governance, making it easier to organize and maintain large datasets.</li>
+<li><strong>Enhanced Ecosystem</strong>: Support for OceanBase, PaddleOCR-VL, and new data sources (Zendesk, Bitbucket) expands deployment options and data integration capabilities.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-python"># Example using the new Memory API
+from ragflow import MemoryClient
+
+# Initialize memory client
+memory = MemoryClient()
+
+# Create a new memory entry
+memory.create_entry(
+    content=&quot;This is a test memory&quot;,
+    session_id=&quot;session_123&quot;,
+    metadata={&quot;source&quot;: &quot;test&quot;}
+)
+
+# Retrieve memories with semantic search
+results = memory.search(&quot;test memory&quot;, limit=5)
+print(results)
+</code></pre>
+
+<hr />
+<p><strong>Note</strong>: The changelog entry shows a release date of 2026-02-10 for v0.24.0, not 2026-02-25. The 2026-02-25 date appears to be a build timestamp rather than a release date.</p>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/Tsukumi233/hotaru-code" target="_blank">hotaru-code</a></h2>
+                    <h2><a href="https://github.com/hiyouga/LlamaFactory" target="_blank">LlamaFactory</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 1</span>
+                        <span class="stars">★ 67549</span>
                     </div>
                 </div>
-                <p class="repo-description">Hotaru Code 用于在终端中提供 AI 编码助手能力。  支持 TUI，并具备SubAgent、工具调用、权限控制、MCP 扩展等能力。</p>
+                <p class="repo-description">Unified Efficient Fine-Tuning of 100+ LLMs & VLMs (ACL 2024)</p>
                 <div class="changelog-summary">
-                    <p>Add reasoning_text handling in ProviderTransform and update related processing logic, extend web command with logging options for level, format, and access log, refactor diagnostics handling and add debounce logic, enhance model state management with persistence option, enhance provider and session handling with strict schema validation, enhance schema normalization by removing titles and flattening nullable types, introduce ToolResolver for effective tool resolution and refactor session processing, implement runtime logging configuration and bootstrap logic, add text sanitization and error handling in streaming process, add fallback logic for interleaved field in message transformation and enhance related tests, add provider configuration application and related tests, refactor provider connection payload structure and update related tests, implement instance context management and runtime binding helpers, add text sanitization for control characters in OpenAI SDK and session processor, add access logging middleware and enhance server startup logging, add session index management and related tests, update agent and config to remove legacy fields, refactor related tests, update max_tokens to use ProviderTransform constant and enhance prompt verbosity examples, enhance timeout configuration for AsyncClient, guard pending queue against concurrent replies, replace KeyError 404 mapping with explicit NotFoundError, re-raise unexpected turn errors, move API server lifecycle management to CLI.</p>
+                    <h3>🚀 What's New</h3>
+<p>LlamaFactory v0.9.4 brings major updates including a repository rename, Python version requirements, and a new package manager, along with exciting new features like OFT, Semantic Initialization, and Megatron-LM support.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Repository name updated: LLaMA-Factory → LlamaFactory</strong>: The project has been renamed for consistency and branding. You'll need to update your import statements and references.</li>
+<li><strong>Python 3.9–3.10 deprecated; now requires Python 3.11–3.13</strong>: This ensures compatibility with newer libraries and performance improvements. Update your Python environment to use version 3.11 or higher.</li>
+<li><strong>Migrated from pip to uv</strong>: The new package manager uv offers faster installations and better dependency management. Use <code>uv pip install llamafactory</code> instead of <code>pip install llamafactory</code>.</li>
+<li><strong>Official LlamaFactory blog is now live</strong>: Stay updated with the latest news, tutorials, and announcements at https://blog.llamafactory.net/en/.</li>
+<li><strong>Support for Orthogonal Fine-Tuning (OFT)</strong>: This new training method can improve model performance by optimizing the orthogonality of weight updates.</li>
+<li><strong>Support for Semantic Initialization for new added tokens</strong>: This feature helps in better initializing new tokens during model fine-tuning, leading to improved results.</li>
+<li><strong>Support for Megatron-LM training via MCoreAdapter</strong>: This allows for more efficient training of large models using the Megatron-LM framework.</li>
+<li><strong>Support for KTransformers backend</strong>: This backend can provide faster inference and training for certain models.</li>
+<li><strong>Support for MPO algorithm</strong>: This algorithm can improve the efficiency of model training.</li>
+<li><strong>Support for FP8 training</strong>: This allows for training with lower precision, which can save memory and speed up training.</li>
+<li><strong>Support for Transformers v5</strong>: This ensures compatibility with the latest version of the Transformers library.</li>
+<li><strong>Support for reasoning and plaintext in function call message</strong>: This feature enhances the model's ability to handle function calls with reasoning and plaintext inputs.</li>
+<li><strong>Support for DeepSpeed AutoTP</strong>: This feature can improve the efficiency of distributed training.</li>
+<li><strong>Support for efficient NPU fused kernels</strong>: This can improve the performance of training on NPU hardware.</li>
+<li><strong>Support for TRL 0.24</strong>: This ensures compatibility with the latest version of the TRL library.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<p>```bash</p>
+<h1>Install LlamaFactory using the new package manager</h1>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/openlayer-ai/openlayer-python" target="_blank">openlayer-python</a></h2>
+                    <h2><a href="https://github.com/docling-project/docling" target="_blank">docling</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 16</span>
+                        <span class="stars">★ 54113</span>
                     </div>
                 </div>
-                <p class="repo-description">The official Python library for Openlayer, the Continuous Model Improvement Platform for AI. 📈</p>
+                <p class="repo-description">Get your documents ready for gen AI</p>
                 <div class="changelog-summary">
-                    <p>The changelog contains an entry dated 2026-02-25 for version 0.17.8. This release includes a single chore: making the <code>test_proxy_environment_variables</code> more resilient to environment conditions, implemented via commit <a href="https://github.com/openlayer-ai/openlayer-python/commit/ad5b39e8b878c8b4737ad49e0f4e66d7a593c0d8">ad5b39e</a>.</p>
+                    <h3>🚀 What's New</h3>
+<p>Docling v2.75.0 introduces XBRL instance report parsing, unified model-family inference engines with KServe v2 API support, and several important fixes.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>XBRL Instance Report Parser</strong>: Now you can directly parse XBRL financial reports without external tools, streamlining financial document workflows.</li>
+<li><strong>Unified Model-Family Inference Engines</strong>: A single abstraction layer now handles image classification and other model families, simplifying model integration and supporting KServe v2 API for better deployment flexibility.</li>
+<li><strong>ASR Segment Fix</strong>: Prevents crashes when processing empty speech segments, improving robustness in audio transcription workflows.</li>
+<li><strong>Hyperlink Guard</strong>: Fixes potential crashes when processing Word documents with missing hyperlink addresses, enhancing document parsing reliability.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-bash"># Update to the latest version
+pip install docling --upgrade
+
+# Parse an XBRL file
+docling parse financial_report.xbrl
+
+# Use the new unified inference engine
+from docling.engine import UnifiedInferenceEngine
+engine = UnifiedInferenceEngine(model=&quot;image-classification&quot;)
+results = engine.predict(image_path)
+</code></pre>
+
+<hr />
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/protocontext/protocontext" target="_blank">protocontext</a></h2>
+                    <h2><a href="https://github.com/mem0ai/mem0" target="_blank">mem0</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 2</span>
+                        <span class="stars">★ 48005</span>
                     </div>
                 </div>
-                <p class="repo-description">Deterministic knowledge layer for RAG systems.  Open standard + search engine + semantic retrieval for AI-readable web content.</p>
+                <p class="repo-description">Universal memory layer for AI Agents</p>
                 <div class="changelog-summary">
-                    <p><strong>PCE (ProtoContext Extension)</strong>: Structured data blocks for products, rooms, tours, actions, policies; <strong>Unified <code>content_type</code> system</strong>: Single field for all content classification; <strong>WooCommerce deep integration</strong>: PCE product blocks with PRODUCT_ID, PRICE, CURRENCY, STOCK_STATUS, PURCHASE_URL, ACTION; <strong>Variable product support</strong>: Lists all WooCommerce variations with attributes and pricing; <strong>WooCommerce category pages</strong>: <code>/context/shop/{category}.txt</code> route; <strong>Industry auto-detection</strong>: Auto-detects ecommerce (WooCommerce), configurable for hospitality, tours, etc.; <strong><code>@content_type</code> and <code>@industry</code> metadata</strong> on all context files; <strong><code>@currency</code> metadata</strong> for ecommerce sites; <strong>Registry sync on startup</strong>: Cleans stale domains not found in Typesense; <strong>Multi-provider AI support</strong>: Gemini, OpenAI, or OpenRouter for content conversion; <strong>OpenRouter integration</strong>: Access hundreds of AI models with a single API key; <strong>Sitemap scraping</strong>: Index any website via sitemap.xml; <strong>llms.txt support</strong>: Convert llms.txt/llms-full.txt to context.txt format; <strong>Language-aware scraping</strong>: Detects and filters multilingual sites; <strong>Admin dashboard</strong>: Next.js web UI with search, submit, stats, API key management; <strong>Auth system</strong>: Setup wizard, login, session tokens, API keys; <strong>MCP server</strong>: Connect ProtoContext to any AI agent via Model Context Protocol; <strong>WordPress plugin</strong>: Auto-generates context.txt from pages, posts, products; <strong>Validator</strong>: Python + JavaScript validators for context.txt format; <strong>Architecture</strong>: Engine: FastAPI + Typesense (semantic search via all-MiniLM-L12-v2); Dashboard: Next.js 16 + shadcn/ui v4 + Tailwind CSS; MCP Server: Python MCP SDK; WordPress Plugin: PHP 7.4+, WooCommerce compatible; Docker Compose for local development.</p>
+                    <h3>🚀 What's New</h3>
+<p>The latest update (v1.0.4) focuses on improving the OpenClaw plugin integration with Mem0, fixing auto-recall injection, and enhancing memory timestamp handling.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>OpenClaw plugin fixes</strong>: The auto-recall injection and auto-capture message drop issues have been resolved, ensuring more reliable memory persistence and retrieval when using OpenClaw agents with Mem0. This means your agents will now consistently remember and recall information across conversations.</li>
+<li><strong>Memory timestamp updates</strong>: The user-facing timestamp for memories has been improved, making it easier to track when memories were created or updated, which is crucial for debugging and understanding memory behavior.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<p>If you're using OpenClaw with Mem0, update to v1.0.4 to benefit from the fixed auto-recall functionality:</p>
+<pre class="codehilite"><code class="language-bash">pip install mem0ai/mem0@v1.0.4
+</code></pre>
+
+<p>Then, in your OpenClaw agent configuration, ensure you're using the latest Mem0 plugin to experience the improved memory persistence and recall.</p>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/Qredence/fleet-rlm" target="_blank">fleet-rlm</a></h2>
+                    <h2><a href="https://github.com/mindsdb/mindsdb" target="_blank">mindsdb</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 21</span>
+                        <span class="stars">★ 38581</span>
                     </div>
                 </div>
-                <p class="repo-description">DSPy's Recursive Language Model (RLM) with Modal Sandbox for secure cloud-based code execution</p>
+                <p class="repo-description">Federated Query Engine for AI - The only MCP Server you'll ever need</p>
                 <div class="changelog-summary">
-                    <p>[Summary Paragraph] The changelog contains an entry dated 2026-02-24 (version 0.4.8) with significant updates including milestone completion across foundation hardening, DB/schema enablers, Canvas UX delivery, telemetry propagation, and live integration validation. Key additions include Codex multi-agent delivery bootstrap, deterministic RLM mock trajectory assessment, RLM/DSPy + Modal infrastructure persistence schema, Canvas graph/timeline/preview features, and AI Elements chat QA + renderer hardening. Changes include backend architecture refactoring, settings surface simplification, and standardized telemetry defaults. Fixes address reasoning stream formatting and telemetry preference propagation. The release also includes 5 merged pull requests and implements 23 milestone issues.</p>
+                    <h3>🚀 What's New</h3>
+<p>MindsDB v26.0.0 brings significant improvements across SQL capabilities, integrations, and knowledge bases, along with critical security upgrades and bug fixes.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>SQL Enhancements</strong>: Fixes for <code>GROUP BY WITH ROLLUP</code> and improved memory handling with DuckDB make SQL queries more reliable and efficient, reducing errors and improving performance.</li>
+<li><strong>Integration Updates</strong>: Static READMEs from GitHub and improved handlers (Shopify, Confluence, Databricks, Hubspot, Netsuite) streamline setup and reduce local storage needs, making integrations easier to manage.</li>
+<li><strong>Knowledge Base Improvements</strong>: Switching to pgvector as the default store in Docker-compose and batching inserts by default enhance performance and scalability for knowledge base operations.</li>
+<li><strong>Security Upgrades</strong>: Updates to packages like urllib3, numpy, and others ensure the system is more secure and reliable, protecting against vulnerabilities.</li>
+<li><strong>Breaking Changes</strong>: The release includes breaking changes, so existing setups may need adjustments to maintain compatibility.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-bash"># Update to the latest version
+pip install mindsdb --upgrade
+
+# Test the new SQL features
+mindsdb --sql &quot;SELECT * FROM table GROUP BY WITH ROLLUP&quot;
+
+# Verify integration improvements
+# Check the updated handlers in your configuration
+</code></pre>
+
+<hr />
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/agno-agi/agno" target="_blank">agno</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 38181</span>
+                    </div>
+                </div>
+                <p class="repo-description">The programming language for agentic software. Build, run, and manage multi-agent systems at scale.</p>
+                <div class="changelog-summary">
+                    <h3>🚀 What's New</h3>
+<p>Agnos v2.5.4 brings enhanced search capabilities, improved team collaboration, and better workflow control with Human-in-the-Loop (HITL) support.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>PgVector Similarity Threshold</strong>: Filter search results by minimum similarity score, giving you more control over vector search relevance.</li>
+<li><strong>Team Streaming Events</strong>: Real-time event emission during autonomous task execution improves visibility into team member activities.</li>
+<li><strong>Workflow HITL Support</strong>: Pause workflows at step level for user confirmation and input, enabling better human oversight in automated processes.</li>
+<li><strong>Metrics Redesign</strong>: Granular per-model and per-component tracking provides deeper insights into agent/team/workflow performance.</li>
+<li><strong>AWS Bedrock Credential Refresh</strong>: Automatic credential refresh prevents authentication failures in long-running workflows.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre class="codehilite"><code class="language-python"># Use PgVector similarity threshold
+from agno.knowledge import Knowledge
+knowledge = Knowledge(&quot;my_db&quot;, &quot;my_table&quot;)
+results = knowledge.search(
+    query=&quot;example&quot;,
+    similarity_threshold=0.8  # Only return results with similarity &gt;= 0.8
+)
+
+# Enable workflow HITL at step level
+from agno.workflow import Workflow, Step
+from agno.agent import Agent
+
+workflow = Workflow(
+    steps=[
+        Step(
+            agent=Agent(tools=[...]),
+            hitl=True  # Pause this step for user confirmation
+        )
+    ]
+)
+</code></pre>
+
+<hr />
+<p><strong>Note</strong>: The changelog shows releases on 2026-02-24 (v2.5.4) and 2026-02-19 (v2.5.3), but no specific entry for 2026-02-25. The latest available version is v2.5.4.</p>
                 </div>
             </article>
             
@@ -184,7 +380,7 @@
     </main>
 
     <footer>
-        <p>Generated at 15:08 UTC • Powered by OpenRouter + GitHub API</p>
+        <p>Generated at 15:28 UTC • Powered by OpenRouter + GitHub API</p>
     </footer>
 </body>
 </html>
