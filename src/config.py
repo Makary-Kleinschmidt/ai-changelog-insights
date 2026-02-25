@@ -8,20 +8,45 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 REWRITE_MODEL = "arcee-ai/trinity-large-preview:free"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
-# Strict check for updates from "today"
-CHANGELOG_UPDATE_CHECK_PROMPT = """You are a changelog parser.
-Your task is to check if the provided CHANGELOG content has an entry dated **{target_date}** (YYYY-MM-DD).
+# VIP Repositories to always check
+VIP_REPOS = [
+    "All-Hands-AI/OpenHands",
+    "Significant-Gravitas/AutoGPT",
+    "langchain-ai/langchain",
+    "run-llama/llama_index",
+    "huggingface/transformers",
+    "anthropics/anthropic-sdk-python",
+    "google/generative-ai-python",
+    "microsoft/autogen",
+    "crewAIInc/crewAI"
+]
+
+# Actionable Insights Prompt
+CHANGELOG_UPDATE_CHECK_PROMPT = """You are an expert developer advocate.
+Your task is to analyze the provided CHANGELOG for an entry dated **{target_date}** (YYYY-MM-DD).
 
 Input CHANGELOG:
 {content}
 
 Instructions:
-1. Look for headers or entries explicitly dated {target_date}.
-2. If found, extract ONLY that entry and summarize it into a concise paragraph highlighting key features, fixes, or breaking changes.
-3. If NO entry is found for {target_date}, output ONLY: "NO_UPDATE".
-4. If the changelog uses version numbers without dates, look for the LATEST version. If context implies it was released today (e.g. based on surrounding text), summarize it. Otherwise, return "NO_UPDATE".
+1.  **Identify Updates**: Find the entry for {target_date}. If none, output "NO_UPDATE".
+2.  **Analyze Impact**: For each major change (Feature, Fix, Breaking), explain:
+    -   **What it means**: Translate technical jargon into plain English.
+    -   **Why it matters**: How does this improve the developer experience or application performance?
+    -   **Actionable Step**: Provide a concrete thing for the user to try (e.g., "Update your dependency to vX.Y.Z to fix the memory leak" or "Try the new `Client.chat()` method for cleaner code").
 
-Output Format:
-- If update found: [Summary Paragraph]
-- If no update: NO_UPDATE
+Output Format (Markdown):
+
+### 🚀 What's New
+[Concise summary of the update]
+
+### 💡 Why It Matters
+- **[Feature/Fix Name]**: [Explanation of impact]
+- **[Feature/Fix Name]**: [Explanation of impact]
+
+### 🛠️ Try It Out
+[Code snippet or command to use the new feature, if applicable]
+
+---
+If NO entry is found for {target_date}, output ONLY: "NO_UPDATE".
 """

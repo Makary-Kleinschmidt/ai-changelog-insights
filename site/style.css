@@ -6,6 +6,7 @@
     --text: #333;
     --meta: #7f8c8d;
     --border: #e0e0e0;
+    --code-bg: rgba(0,0,0,0.05);
 }
 
 [data-theme="dark"] {
@@ -16,6 +17,7 @@
     --text: #e0e0e0;
     --meta: #95a5a6;
     --border: #404040;
+    --code-bg: rgba(255,255,255,0.1);
 }
 
 body {
@@ -81,11 +83,11 @@ h1 {
 }
 
 main {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 2rem auto;
     padding: 0 1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 1.5rem;
 }
 
@@ -98,6 +100,8 @@ main {
     transition: transform 0.2s, box-shadow 0.2s;
     display: flex;
     flex-direction: column;
+    /* Ensure container doesn't constrain content too much */
+    min-width: 0;
 }
 
 .repo-card:hover {
@@ -150,6 +154,8 @@ main {
     overflow: hidden;
 }
 
+/* ... existing styles ... */
+
 .changelog-summary {
     font-size: 0.95rem;
     border-top: 1px solid var(--border);
@@ -157,26 +163,101 @@ main {
     flex-grow: 1;
 }
 
+/* Accordion Styles */
+.accordion-section {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+}
+
+.accordion-section:last-child {
+    border-bottom: none;
+}
+
+.accordion-header {
+    cursor: pointer;
+    padding: 0.8rem 0;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    margin: 0; /* Reset default h3 margin */
+}
+
+.accordion-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.accordion-header::after {
+    content: '+';
+    font-size: 1.5rem;
+    color: var(--meta);
+    transition: transform 0.3s ease;
+    margin-left: 1rem;
+}
+
+.accordion-header[aria-expanded="true"]::after {
+    transform: rotate(45deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease;
+    opacity: 0;
+}
+
+.accordion-content.expanded {
+    opacity: 1;
+    padding-bottom: 1rem;
+    /* Max-height will be set by JS, but give it a safe fallback/initial transition target if needed, 
+       though JS scrollHeight is better */
+}
+
+/* Code block fixes */
+.changelog-summary pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    /* Wrap text to prevent overflow as requested */
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+.changelog-summary code {
+    background: transparent; /* inherited from pre if inside */
+    padding: 0;
+    border-radius: 0;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    color: var(--accent);
+    /* Ensure inline code also behaves well */
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Adjust lists inside summary */
 .changelog-summary ul {
     padding-left: 1.2rem;
     margin: 0.5rem 0;
 }
 
 .changelog-summary li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
 }
 
-.changelog-summary code {
-    background: rgba(0,0,0,0.05);
-    padding: 0.1rem 0.3rem;
-    border-radius: 3px;
-    font-family: monospace;
-    font-size: 0.9em;
-}
-
-[data-theme="dark"] .changelog-summary code {
-    background: rgba(255,255,255,0.1);
-}
 
 .empty-state {
     grid-column: 1 / -1;

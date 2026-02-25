@@ -21,54 +21,94 @@ def generate_site(target_date_str: str = None):
     
     processed_repos = []
     MAX_REPOS = 10
-    CHECK_LIMIT = 100 # Safety break to avoid infinite loops
-    checked_count = 0
+    CHECK_LIMIT = 200 # Increased limit
     
-    # 1. Iterate through active repos
-    repo_generator = yield_active_ai_repos()
+    # Dates to check: Target Date, then previous days if needed
+    target_date = datetime.strptime(target_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    dates_to_check = [target_date_str]
+    
+    # Add previous 2 days as fallback
+    for i in range(1, 3):
+        prev_date = target_date - timedelta(days=i)
+        dates_to_check.append(prev_date.strftime("%Y-%m-%d"))
+        
+    print(f"📅 Strategy: Check {dates_to_check[0]} first, then fallback to {dates_to_check[1:]} if needed.")
+    
+    primary_list = []
+    secondary_list = []
+    
+    checked_count = 0
+    repo_generator = yield_active_ai_repos(days_lookback=3)
     
     start_time = time.time()
     
     for repo_data in repo_generator:
         checked_count += 1
-        print(f"[{checked_count}/{CHECK_LIMIT}] Checking {repo_data['full_name']} for updates on {target_date_str}...")
+        print(f"[{checked_count}/{CHECK_LIMIT}] Checking {repo_data['full_name']} (Stars: {repo_data['stars']})...")
         
-        # Check changelog content
         if not repo_data['changelog']:
-            print("  -> No CHANGELOG file found. Skipping.")
+            print("  -> No CHANGELOG or Releases found. Skipping.")
             continue
             
-        # Check for specific daily update via LLM
-        daily_summary = check_for_daily_update(repo_data['changelog'], target_date_str)
+        # Check Today
+        summary_today = check_for_daily_update(repo_data['changelog'], dates_to_check[0])
         
-        if daily_summary and daily_summary != "NO_UPDATE":
-            print(f"  ✅ FOUND UPDATE for {repo_data['full_name']}!")
+        if summary_today and summary_today != "NO_UPDATE":
+            print(f"  ✅ FOUND UPDATE for {dates_to_check[0]}!")
+            summary_html = markdown.markdown(summary_today, extensions=['extra', 'codehilite'])
             
-            # Convert markdown summary to HTML
-            summary_html = markdown.markdown(daily_summary, extensions=['extra', 'codehilite'])
-            
-            processed_repos.append({
+            primary_list.append({
                 "name": repo_data['name'],
                 "full_name": repo_data['full_name'],
                 "description": repo_data['description'],
                 "url": repo_data['url'],
                 "stars": repo_data['stars'],
                 "summary_html": summary_html,
-                "timestamp": datetime.now(timezone.utc).isoformat()
+                "update_date": dates_to_check[0],
+                "is_fresh": True
             })
-            
-            if len(processed_repos) >= MAX_REPOS:
-                print("🎉 Secured 10 distinct daily updates!")
-                break
         else:
-            print("  -> No entry found for target date.")
+            # Check Yesterday (Fallback)
+            print(f"  -> No update for {dates_to_check[0]}. Checking {dates_to_check[1]}...")
+            summary_yesterday = check_for_daily_update(repo_data['changelog'], dates_to_check[1])
+            
+            if summary_yesterday and summary_yesterday != "NO_UPDATE":
+                print(f"  ⚠️ FOUND OLDER UPDATE for {dates_to_check[1]}")
+                summary_html = markdown.markdown(summary_yesterday, extensions=['extra', 'codehilite'])
+                
+                secondary_list.append({
+                    "name": repo_data['name'],
+                    "full_name": repo_data['full_name'],
+                    "description": repo_data['description'],
+                    "url": repo_data['url'],
+                    "stars": repo_data['stars'],
+                    "summary_html": summary_html,
+                    "update_date": dates_to_check[1],
+                    "is_fresh": False
+                })
+            else:
+                 print("  -> No recent updates found.")
+
+        # Check termination condition
+        if len(primary_list) >= MAX_REPOS:
+            print("🎉 Secured 10 fresh updates!")
+            break
             
         if checked_count >= CHECK_LIMIT:
             print("⚠️ Reached check limit. Stopping search.")
             break
+            
+    # Combine lists
+    # Prioritize fresh updates
+    final_repos = primary_list
+    
+    if len(final_repos) < MAX_REPOS:
+        needed = MAX_REPOS - len(final_repos)
+        print(f"ℹ️ Filling {needed} slots with older updates...")
+        final_repos.extend(secondary_list[:needed])
 
     # 2. Generate HTML
-    print(f"🎨 Generating dashboard with {len(processed_repos)} updates...")
+    print(f"🎨 Generating dashboard with {len(final_repos)} updates...")
     
     try:
         with open("site/template.html", "r", encoding="utf-8") as f:
@@ -77,7 +117,7 @@ def generate_site(target_date_str: str = None):
         html = template.render(
             title="AI Changelog Insights",
             date=target_date_str,
-            repos=processed_repos,
+            repos=final_repos,
             generated_at=datetime.now(timezone.utc).strftime("%H:%M UTC")
         )
         
@@ -89,7 +129,7 @@ def generate_site(target_date_str: str = None):
             json.dump({
                 "last_updated": datetime.now(timezone.utc).isoformat(),
                 "target_date": target_date_str,
-                "repo_count": len(processed_repos),
+                "repo_count": len(final_repos),
                 "duration_seconds": time.time() - start_time
             }, f, indent=2)
             

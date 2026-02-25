@@ -17,6 +17,107 @@
         // Init theme
         const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', saved);
+
+        // Accordion Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const summaries = document.querySelectorAll('.changelog-summary');
+            
+            summaries.forEach(summary => {
+                const children = Array.from(summary.children);
+                if (children.length === 0) return;
+
+                const newContainer = document.createDocumentFragment();
+                let currentSection = null;
+                let currentContent = null;
+                let hasSections = false;
+
+                // Check if we have any h3s to determine if we should apply accordion structure
+                const hasH3 = children.some(child => child.tagName === 'H3');
+
+                if (!hasH3) {
+                    // If no sections defined, leave as is (or wrap in one open section?)
+                    // For now, let's leave it alone if no structure detected.
+                    return;
+                }
+
+                children.forEach(child => {
+                    if (child.tagName === 'H3') {
+                        // Close previous section
+                        if (currentSection && currentContent) {
+                            currentSection.appendChild(currentContent);
+                            newContainer.appendChild(currentSection);
+                        }
+
+                        // Start new section
+                        currentSection = document.createElement('div');
+                        currentSection.className = 'accordion-section';
+
+                        const header = document.createElement('button');
+                        header.className = 'accordion-header';
+                        header.setAttribute('aria-expanded', 'false');
+                        
+                        // Move H3 inside button or keep as H3?
+                        // Better accessibility: Button containing the H3 content
+                        // But we want to keep semantic H3. 
+                        // Let's make the button wrap the H3 or put H3 inside.
+                        // CSS expects .accordion-header h3
+                        
+                        const h3 = child.cloneNode(true);
+                        header.appendChild(h3);
+
+                        header.addEventListener('click', function() {
+                            const expanded = this.getAttribute('aria-expanded') === 'true';
+                            this.setAttribute('aria-expanded', !expanded);
+                            
+                            const content = this.nextElementSibling;
+                            if (content) {
+                                content.classList.toggle('expanded');
+                                if (!expanded) {
+                                    content.style.maxHeight = content.scrollHeight + "px";
+                                } else {
+                                    content.style.maxHeight = null;
+                                }
+                            }
+                        });
+
+                        currentSection.appendChild(header);
+
+                        currentContent = document.createElement('div');
+                        currentContent.className = 'accordion-content';
+                        hasSections = true;
+                    } else {
+                        if (currentContent) {
+                            currentContent.appendChild(child.cloneNode(true));
+                        } else {
+                            // Content before first H3, or if no H3s found yet.
+                            // If we are strictly following "What's New" etc., there should be an H3 first.
+                            // If not, maybe create a default section or append to fragment?
+                            // Let's append to a default "Overview" section if we want, or just pre-text.
+                            // Given the prompt, likely strict structure.
+                            // Let's create a "General" section if content exists before first H3?
+                            // Or just leave it outside.
+                            if (!currentSection) {
+                                // Create a pre-content div
+                                const preDiv = document.createElement('div');
+                                preDiv.appendChild(child.cloneNode(true));
+                                newContainer.appendChild(preDiv);
+                            }
+                        }
+                    }
+                });
+
+                // Append final section
+                if (currentSection && currentContent) {
+                    currentSection.appendChild(currentContent);
+                    newContainer.appendChild(currentSection);
+                }
+
+                if (hasSections) {
+                    summary.innerHTML = '';
+                    summary.appendChild(newContainer);
+                }
+            });
+        });
     </script>
 </head>
 <body>

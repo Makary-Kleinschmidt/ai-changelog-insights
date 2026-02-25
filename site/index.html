@@ -17,6 +17,107 @@
         // Init theme
         const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', saved);
+
+        // Accordion Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const summaries = document.querySelectorAll('.changelog-summary');
+            
+            summaries.forEach(summary => {
+                const children = Array.from(summary.children);
+                if (children.length === 0) return;
+
+                const newContainer = document.createDocumentFragment();
+                let currentSection = null;
+                let currentContent = null;
+                let hasSections = false;
+
+                // Check if we have any h3s to determine if we should apply accordion structure
+                const hasH3 = children.some(child => child.tagName === 'H3');
+
+                if (!hasH3) {
+                    // If no sections defined, leave as is (or wrap in one open section?)
+                    // For now, let's leave it alone if no structure detected.
+                    return;
+                }
+
+                children.forEach(child => {
+                    if (child.tagName === 'H3') {
+                        // Close previous section
+                        if (currentSection && currentContent) {
+                            currentSection.appendChild(currentContent);
+                            newContainer.appendChild(currentSection);
+                        }
+
+                        // Start new section
+                        currentSection = document.createElement('div');
+                        currentSection.className = 'accordion-section';
+
+                        const header = document.createElement('button');
+                        header.className = 'accordion-header';
+                        header.setAttribute('aria-expanded', 'false');
+                        
+                        // Move H3 inside button or keep as H3?
+                        // Better accessibility: Button containing the H3 content
+                        // But we want to keep semantic H3. 
+                        // Let's make the button wrap the H3 or put H3 inside.
+                        // CSS expects .accordion-header h3
+                        
+                        const h3 = child.cloneNode(true);
+                        header.appendChild(h3);
+
+                        header.addEventListener('click', function() {
+                            const expanded = this.getAttribute('aria-expanded') === 'true';
+                            this.setAttribute('aria-expanded', !expanded);
+                            
+                            const content = this.nextElementSibling;
+                            if (content) {
+                                content.classList.toggle('expanded');
+                                if (!expanded) {
+                                    content.style.maxHeight = content.scrollHeight + "px";
+                                } else {
+                                    content.style.maxHeight = null;
+                                }
+                            }
+                        });
+
+                        currentSection.appendChild(header);
+
+                        currentContent = document.createElement('div');
+                        currentContent.className = 'accordion-content';
+                        hasSections = true;
+                    } else {
+                        if (currentContent) {
+                            currentContent.appendChild(child.cloneNode(true));
+                        } else {
+                            // Content before first H3, or if no H3s found yet.
+                            // If we are strictly following "What's New" etc., there should be an H3 first.
+                            // If not, maybe create a default section or append to fragment?
+                            // Let's append to a default "Overview" section if we want, or just pre-text.
+                            // Given the prompt, likely strict structure.
+                            // Let's create a "General" section if content exists before first H3?
+                            // Or just leave it outside.
+                            if (!currentSection) {
+                                // Create a pre-content div
+                                const preDiv = document.createElement('div');
+                                preDiv.appendChild(child.cloneNode(true));
+                                newContainer.appendChild(preDiv);
+                            }
+                        }
+                    }
+                });
+
+                // Append final section
+                if (currentSection && currentContent) {
+                    currentSection.appendChild(currentContent);
+                    newContainer.appendChild(currentSection);
+                }
+
+                if (hasSections) {
+                    summary.innerHTML = '';
+                    summary.appendChild(newContainer);
+                }
+            });
+        });
     </script>
 </head>
 <body>
@@ -37,34 +138,47 @@
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/huggingface/transformers" target="_blank">transformers</a></h2>
+                    <h2><a href="https://github.com/OpenHands/OpenHands" target="_blank">OpenHands</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 156969</span>
+                        <span class="stars">★ 68172</span>
                     </div>
                 </div>
-                <p class="repo-description">🤗 Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training. </p>
+                <p class="repo-description">🙌 OpenHands: AI-Driven Development</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>The changelog shows updates from <strong>2026-02-16</strong> (v5.2.0), not 2026-02-25. This release includes major new model additions and several breaking changes and improvements.</p>
+<p>No update found for 2026-02-25. The latest available version is 1.4.0 from 2026-02-17.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>VoxtralRealtime</strong>: A new streaming speech-to-text model from Mistral AI that enables real-time transcription with low latency. This is significant for applications requiring live audio processing like virtual meetings or live captioning.</li>
-<li><strong>GLM-5 (GlmMoeDsa)</strong>: A massive 744B parameter model from zAI with enhanced reasoning, coding, and agentic capabilities. The integration of DeepSeek Sparse Attention (DSA) makes it more efficient to deploy while maintaining long-context capacity.</li>
-<li><strong>Qwen3.5</strong>: A native vision-language model with 397B total parameters but only 17B activated per forward pass, offering remarkable inference efficiency. The expanded language support (201 languages) makes it globally accessible.</li>
-<li><strong>VibeVoice Acoustic Tokenizer</strong>: A novel framework for synthesizing high-fidelity, long-form speech with multiple speakers, particularly suited for podcasts and audiobooks.</li>
+<li><strong>MiniMax-M2.5 Model Support</strong>: Adds support for the MiniMax-M2.5 model, expanding the range of AI models available to users.</li>
+<li><strong>Fixed Error Status Display</strong>: Resolved an issue where resumed conversations incorrectly showed an error status during startup, improving user experience.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
-<pre class="codehilite"><code class="language-python"># Try VoxtralRealtime for streaming transcription
-from transformers import AutoProcessor, VoxtralRealtimeForConditionalGeneration
-
-processor = AutoProcessor.from_pretrained(&quot;mistralai/Voxtral-Mini-4B-Realtime-2602&quot;)
-model = VoxtralRealtimeForConditionalGeneration.from_pretrained(&quot;mistralai/Voxtral-Mini-4B-Realtime-2602&quot;, device_map=&quot;auto&quot;)
-
-# Process audio chunks as they arrive for real-time transcription
+<p>Update to version 1.4.0 to access the new MiniMax-M2.5 model and benefit from the fixed error status display.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank">AutoGPT</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 182014</span>
+                    </div>
+                </div>
+                <p class="repo-description">AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters.</p>
+                <div class="changelog-summary">
+                    <h3>🚀 What's New</h3>
+<p>AutoGPT Platform v0.6.48 focuses on security improvements and dependency updates, with a critical fix for graph validation.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Enforce disabled flag on blocks in graph validation</strong>: This security enhancement ensures that disabled blocks are properly validated and cannot be accidentally executed, preventing potential security vulnerabilities in your AI workflows.</li>
+<li><strong>Dependency updates</strong>: The bump of actions/checkout from 4 to 6 and other dependency updates provide better compatibility, security patches, and performance improvements.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<p>Update to the latest version to benefit from the security improvements:</p>
+<pre class="codehilite"><code class="language-bash">git pull origin autogpt-platform-beta-v0.6.48
 </code></pre>
 
-<hr />
-<p><strong>Note</strong>: No changelog entry was found for 2026-02-25. The latest entry is from 2026-02-16 (v5.2.0).</p>
+<p>After updating, verify that your disabled blocks remain properly validated by testing your graph workflows.</p>
                 </div>
             </article>
             
@@ -78,52 +192,61 @@ model = VoxtralRealtimeForConditionalGeneration.from_pretrained(&quot;mistralai/
                 <p class="repo-description">None</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>The Anthropic SDK for Python has been updated to version 0.84.0, bringing several improvements including enhanced MCP (Model Context Protocol) tool support, better HTTP request handling, and a rebranding to "Claude SDK".</p>
+<p>The Anthropic SDK for Python has been updated to version 0.84.0, bringing new features and improvements for working with MCP (Model Context Protocol) tools and enhancing internal testing capabilities.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>MCP Tool Conversion Helpers</strong>: The new conversion helpers for MCP tools, prompts, and resources make it easier to integrate and work with MCP tools in your applications, streamlining the development process for tool-based AI interactions.</li>
-<li><strong>Array Format Change to Brackets</strong>: Changing the array format to brackets improves consistency with common HTTP conventions, making API requests more predictable and easier to debug.</li>
-<li><strong>Enhanced SSE Request Options</strong>: Adding request options to SSE (Server-Sent Events) classes provides more control over streaming responses, allowing for better customization of real-time data handling.</li>
-<li><strong>Rebranding to Claude SDK</strong>: The rebranding to "Claude SDK" aligns the package name with the product, making it clearer for developers what they're working with and improving discoverability.</li>
+<li><strong>MCP Conversion Helpers</strong>: The SDK now includes conversion helpers for MCP tools, prompts, and resources, making it easier to integrate and work with MCP-based applications. This simplifies the process of converting between different MCP formats and the SDK's internal representations.</li>
+<li><strong>Array Format Change</strong>: The API now uses bracket notation for array formatting, which is a more standard and predictable way to handle array parameters in HTTP requests. This change improves consistency with other HTTP clients and APIs.</li>
+<li><strong>Enhanced Testing Resilience</strong>: Internal test improvements make proxy environment variable testing more robust, reducing false negatives in CI/CD pipelines and improving overall development reliability.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
-<pre class="codehilite"><code class="language-python"># Example of using the new MCP conversion helpers
-from anthropic import Anthropic
+<pre class="codehilite"><code class="language-python">from anthropic import Anthropic
 
+# Initialize client
 client = Anthropic()
-# Convert MCP tools to SDK format
-converted_tools = client.convert_mcp_tools(mcp_tools)
 
-# Use the new array format in requests
-response = client.messages.create(
-    model=&quot;claude-3-5-sonnet-20241022&quot;,
-    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}],
-    array_format=&quot;brackets&quot;  # New format option
-)
+# Use new MCP conversion helpers
+mcp_tool = client.mcp.convert_to_tool(some_tool_data)
+mcp_prompt = client.mcp.convert_to_prompt(some_prompt_data)
+mcp_resource = client.mcp.convert_to_resource(some_resource_data)
 </code></pre>
+
+<hr />
+<p><strong>Note</strong>: The changelog shows multiple recent versions (0.84.0 through 0.77.1) with various features and fixes. The 0.84.0 release on 2026-02-25 specifically introduces MCP conversion helpers and array format changes.</p>
                 </div>
             </article>
             
             <article class="repo-card">
                 <div class="repo-header">
-                    <h2><a href="https://github.com/open-webui/open-webui" target="_blank">open-webui</a></h2>
+                    <h2><a href="https://github.com/crewAIInc/crewAI" target="_blank">crewAI</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 124892</span>
+                        <span class="stars">★ 44603</span>
                     </div>
                 </div>
-                <p class="repo-description">User-friendly AI Interface (Supports Ollama, OpenAI API, ...)</p>
+                <p class="repo-description">Framework for orchestrating role-playing, autonomous AI agents. By fostering collaborative intelligence, CrewAI empowers agents to work together seamlessly, tackling complex tasks.</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>No update found for 2026-02-25. The latest entry is v0.8.5 from 2026-02-23.</p>
+<p>CrewAI 1.10.0a1 introduces significant architectural refactoring, including a New Unified Memory System and provider pattern extraction, alongside numerous bug fixes for flow tracking, event handling, and tool usage.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Voice dictation shortcut</strong>: Users can now toggle voice dictation using Cmd+Shift+L (or Ctrl+Shift+L on Windows/Linux), making it faster to start and stop dictation without clicking the microphone button.</li>
-<li><strong>Model access KeyError fix</strong>: The /api/models endpoint no longer crashes with a 500 error when models have incomplete info metadata missing the user_id field (e.g. models using global default metadata).</li>
-<li><strong>Frontend initialization resilience</strong>: The app layout now gracefully handles individual API failures during initialization (getModels, getBanners, getTools, getUserSettings, setToolServers) instead of blocking the entire page load when any single call fails.</li>
-<li><strong>Backend config null safety</strong>: Language detection during app initialization no longer crashes when the backend config fetch fails, preventing a secondary cause of infinite loading.</li>
+<li><strong>New Unified Memory System</strong>: This centralizes memory management across agents and flows, reducing complexity and improving performance. It means your agents can now share and persist memory more efficiently, leading to more coherent and context-aware interactions.</li>
+<li><strong>Provider Pattern Extraction</strong>: By refactoring the crew and HITL (Human-in-the-Loop) components into provider patterns, the framework becomes more modular and extensible. This allows for easier integration of new providers and customization of existing ones.</li>
+<li><strong>Enhanced Flow Tracking and Event Handling</strong>: Fixes for flow tracking and event ordering ensure more reliable execution of complex workflows, reducing the likelihood of silent failures or race conditions.</li>
+<li><strong>Version Checking and Update Notices</strong>: The addition of version checking helps users stay informed about updates and potential breaking changes, improving the overall development experience.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
-<p>Update to v0.8.5 to benefit from these improvements.</p>
+<p>To leverage the new Unified Memory System, update your CrewAI dependency and explore the enhanced memory management capabilities in your agent configurations. For example:</p>
+<pre class="codehilite"><code class="language-python">from crewai import Agent, Memory
+
+# Create an agent with the new unified memory
+agent = Agent(
+    memory=Memory(),
+    tools=[...],
+    ...
+)
+</code></pre>
+
+<p>For more details, refer to the <a href="https://docs.crewai.com/">CrewAI Documentation</a>.</p>
                 </div>
             </article>
             
@@ -137,24 +260,26 @@ response = client.messages.create(
                 <p class="repo-description">The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>ComfyUI v0.15.0 released on 2026-02-24 with significant new features including native text generation support, audio processing nodes, and enhanced API integrations.</p>
+<p>ComfyUI v0.15.0 brings significant improvements including new API nodes, enhanced audio processing, and better workflow management with essential subgraph blueprints.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Native Text Generation Support</strong>: Adds built-in text generation capabilities using models like Gemma3, eliminating the need for external API calls for basic text tasks</li>
-<li><strong>Audio Processing Nodes</strong>: Introduces a 3-band equalizer and GLSL shader nodes for audio and visual effects, expanding ComfyUI's multimedia capabilities</li>
-<li><strong>Enhanced API Integrations</strong>: Adds ElevenLabs nodes for text-to-speech and new ByteDance Seedream-5 model support, providing more creative options</li>
-<li><strong>Performance Optimizations</strong>: Includes fixes for fp8 dynamic_vram workflows and improved PyTorch allocator integration for better memory management</li>
+<li><strong>Essential Subgraph Blueprints</strong>: Adds 24 non-cloud essential blueprints covering common workflows like text→image/video generation, image editing, inpainting/outpainting, upscaling, and 3D model generation. This makes it easier for users to get started with complex workflows without building from scratch.</li>
+<li><strong>Text Generation Support</strong>: Introduces basic text generation support with native models, initially supporting Gemma3. This expands ComfyUI's capabilities beyond image generation to include text-based AI tasks.</li>
+<li><strong>Audio Processing Enhancements</strong>: Adds a simple 3-band equalizer node and fixes non-contiguous audio waveform crashes in video save, improving audio workflow reliability and quality.</li>
+<li><strong>API Node Expansion</strong>: Adds new API nodes including ElevenLabs for audio, KlingAvatar, and ByteDance Seedream-5 model, expanding the range of AI services available within ComfyUI.</li>
+<li><strong>Performance Optimizations</strong>: Includes fixes for fp8 dynamic_vram workflows and improved PyTorch allocator integration with comfy-aimdo 0.2, enhancing performance on memory-constrained systems.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
 <pre class="codehilite"><code class="language-bash"># Update to the latest version
 pip install --upgrade comfyui
 
-# Try the new text generation node
-# Add a Gemma3 text generation node to your workflow
+# Try the new text generation with Gemma3
+# Load a workflow that uses the new text generation node
+# Explore the new essential subgraph blueprints in the workflow library
 </code></pre>
 
 <hr />
-<p><strong>Note</strong>: The changelog shows releases on 2026-02-24 (v0.15.0), 2026-02-18 (v0.14.2), and 2026-02-17 (v0.14.1), but no specific entry for 2026-02-25. The latest available version is v0.15.0 from 2026-02-24.</p>
+<p><strong>Note</strong>: The changelog shows v0.15.0 was released on 2026-02-24, not 2026-02-25. The most recent update available is v0.15.0 with the features listed above.</p>
                 </div>
             </article>
             
@@ -168,35 +293,39 @@ pip install --upgrade comfyui
                 <p class="repo-description">RAGFlow is a leading open-source Retrieval-Augmented Generation (RAG) engine that fuses cutting-edge RAG with Agent capabilities to create a superior context layer for LLMs</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>RAGFlow v0.24.0 introduces significant enhancements across memory management, agent capabilities, and system integrations, making it easier to build and maintain intelligent applications.</p>
+<p>RAGFlow v0.24.0 introduces significant enhancements across memory management, agent capabilities, and system governance, making it more powerful and developer-friendly.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Memory Management</strong>: The new Memory extraction log display and APIs/SDK provide transparency into memory operations and enable seamless integration for CRUD operations and intelligent retrieval. This means developers can now debug memory issues more effectively and build more sophisticated conversational applications.</li>
-<li><strong>Agent Chat Management</strong>: The new Chat-like interface with session retention and multi-Sandbox support (local gVisor and Alibaba Cloud) allows for better conversation management and deployment flexibility. This improves the user experience for both developers and end-users.</li>
-<li><strong>Dataset Improvements</strong>: Batch metadata management and the renamed PageIndex feature streamline knowledge base governance, making it easier to organize and maintain large datasets.</li>
-<li><strong>Enhanced Ecosystem</strong>: Support for OceanBase, PaddleOCR-VL, and new data sources (Zendesk, Bitbucket) expands deployment options and data integration capabilities.</li>
+<li><strong>Memory Management</strong>: The new Memory API and SDK allow developers to programmatically manage memories with intelligent retrieval, session organization, and CRUD operations. This means you can now build more context-aware applications with better state persistence.</li>
+<li><strong>Agent Chat Management</strong>: The new chat interface retains conversation history and sessions, making it easier to manage multi-turn interactions and maintain context across conversations.</li>
+<li><strong>Multi-Sandbox Support</strong>: With support for local gVisor and Alibaba Cloud sandboxes, developers can now run agents in isolated environments, improving security and resource management.</li>
+<li><strong>Enhanced Dataset Management</strong>: Batch metadata management and the renamed "PageIndex" feature streamline knowledge base organization and improve retrieval accuracy.</li>
+<li><strong>Expanded Ecosystem</strong>: New integrations with Zendesk, Bitbucket, and OceanBase database expand RAGFlow's connectivity options for enterprise deployments.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
 <pre class="codehilite"><code class="language-python"># Example using the new Memory API
-from ragflow import MemoryClient
+from ragflow.memory import MemoryClient
 
 # Initialize memory client
 memory = MemoryClient()
 
-# Create a new memory entry
-memory.create_entry(
-    content=&quot;This is a test memory&quot;,
-    session_id=&quot;session_123&quot;,
-    metadata={&quot;source&quot;: &quot;test&quot;}
+# Create a new memory
+memory.create(memory_name=&quot;customer_conversation&quot;, description=&quot;Customer support chat history&quot;)
+
+# Add memory entry
+memory.add_entry(
+    memory_id=&quot;customer_conversation&quot;,
+    content=&quot;User asked about refund policy&quot;,
+    session_id=&quot;session_123&quot;
 )
 
-# Retrieve memories with semantic search
-results = memory.search(&quot;test memory&quot;, limit=5)
+# Retrieve memories by keyword
+results = memory.search(keyword=&quot;refund&quot;)
 print(results)
 </code></pre>
 
 <hr />
-<p><strong>Note</strong>: The changelog entry shows a release date of 2026-02-10 for v0.24.0, not 2026-02-25. The 2026-02-25 date appears to be a build timestamp rather than a release date.</p>
+<p><strong>Note</strong>: The changelog shows a release date of 2026-02-10 for v0.24.0, not 2026-02-25. The entry dated 2026-02-25 appears to be a nightly build created from the v0.24.0 release.</p>
                 </div>
             </article>
             
@@ -210,28 +339,37 @@ print(results)
                 <p class="repo-description">Unified Efficient Fine-Tuning of 100+ LLMs & VLMs (ACL 2024)</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>LlamaFactory v0.9.4 brings major updates including a repository rename, Python version requirements, and a new package manager, along with exciting new features like OFT, Semantic Initialization, and Megatron-LM support.</p>
+<p>LlamaFactory v0.9.4 brings major breaking changes and exciting new features, including Python 3.11+ requirement, migration to uv package manager, and support for cutting-edge training techniques.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Repository name updated: LLaMA-Factory → LlamaFactory</strong>: The project has been renamed for consistency and branding. You'll need to update your import statements and references.</li>
-<li><strong>Python 3.9–3.10 deprecated; now requires Python 3.11–3.13</strong>: This ensures compatibility with newer libraries and performance improvements. Update your Python environment to use version 3.11 or higher.</li>
-<li><strong>Migrated from pip to uv</strong>: The new package manager uv offers faster installations and better dependency management. Use <code>uv pip install llamafactory</code> instead of <code>pip install llamafactory</code>.</li>
-<li><strong>Official LlamaFactory blog is now live</strong>: Stay updated with the latest news, tutorials, and announcements at https://blog.llamafactory.net/en/.</li>
-<li><strong>Support for Orthogonal Fine-Tuning (OFT)</strong>: This new training method can improve model performance by optimizing the orthogonality of weight updates.</li>
-<li><strong>Support for Semantic Initialization for new added tokens</strong>: This feature helps in better initializing new tokens during model fine-tuning, leading to improved results.</li>
-<li><strong>Support for Megatron-LM training via MCoreAdapter</strong>: This allows for more efficient training of large models using the Megatron-LM framework.</li>
-<li><strong>Support for KTransformers backend</strong>: This backend can provide faster inference and training for certain models.</li>
-<li><strong>Support for MPO algorithm</strong>: This algorithm can improve the efficiency of model training.</li>
-<li><strong>Support for FP8 training</strong>: This allows for training with lower precision, which can save memory and speed up training.</li>
-<li><strong>Support for Transformers v5</strong>: This ensures compatibility with the latest version of the Transformers library.</li>
-<li><strong>Support for reasoning and plaintext in function call message</strong>: This feature enhances the model's ability to handle function calls with reasoning and plaintext inputs.</li>
-<li><strong>Support for DeepSpeed AutoTP</strong>: This feature can improve the efficiency of distributed training.</li>
-<li><strong>Support for efficient NPU fused kernels</strong>: This can improve the performance of training on NPU hardware.</li>
-<li><strong>Support for TRL 0.24</strong>: This ensures compatibility with the latest version of the TRL library.</li>
+<li><strong>Repository name updated</strong>: LLaMA-Factory → LlamaFactory - Simplifies branding and reduces confusion</li>
+<li><strong>Python 3.9–3.10 deprecated</strong>: LlamaFactory now requires Python 3.11–3.13 - Ensures compatibility with latest libraries and security updates</li>
+<li><strong>Migrated from pip to uv</strong>: Use <code>uv pip install llamafactory</code> - Faster, more reliable package management with better dependency resolution</li>
+<li><strong>Official LlamaFactory blog live</strong>: https://blog.llamafactory.net/en/ - Centralized documentation and community updates</li>
+<li><strong>Orthogonal Fine-Tuning (OFT)</strong>: New training technique for better parameter efficiency - Reduces memory usage while maintaining model quality</li>
+<li><strong>Semantic Initialization for new tokens</strong>: Smarter token addition - Improves performance when extending vocabulary</li>
+<li><strong>Megatron-LM training via MCoreAdapter</strong>: Distributed training support - Enables training on massive datasets across multiple GPUs</li>
+<li><strong>KTransformers backend</strong>: Alternative inference backend - Better performance on certain hardware configurations</li>
+<li><strong>Transformers v5 support</strong>: Latest Hugging Face integration - Access to newest model architectures and optimizations</li>
+<li><strong>FP8 training</strong>: Mixed-precision training - Faster training with reduced memory footprint</li>
+<li><strong>MPO algorithm</strong>: New optimization technique - Better convergence and training stability</li>
+<li><strong>DeepSpeed AutoTP</strong>: Automatic tensor parallelism - Simplifies distributed training setup</li>
+<li><strong>NPU fused kernels</strong>: Optimized for Neural Processing Units - Better performance on specialized AI hardware</li>
+<li><strong>TRL 0.24 support</strong>: Latest reinforcement learning tools - More training options for advanced use cases</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
-<p>```bash</p>
-<h1>Install LlamaFactory using the new package manager</h1>
+<pre class="codehilite"><code class="language-bash"># Install with uv (recommended)
+uv pip install llamafactory
+
+# Check Python version
+python --version  # Should be 3.11 or higher
+
+# Try the new OFT training
+llamafactory train --config config.yaml --technique OFT
+</code></pre>
+
+<hr />
+<p><strong>Note</strong>: The changelog shows v0.9.4 was released on 2025-12-31, not 2026-02-25. No update found for the requested date.</p>
                 </div>
             </article>
             
@@ -239,7 +377,7 @@ print(results)
                 <div class="repo-header">
                     <h2><a href="https://github.com/docling-project/docling" target="_blank">docling</a></h2>
                     <div class="repo-meta">
-                        <span class="stars">★ 54113</span>
+                        <span class="stars">★ 54112</span>
                     </div>
                 </div>
                 <p class="repo-description">Get your documents ready for gen AI</p>
@@ -248,50 +386,26 @@ print(results)
 <p>Docling v2.75.0 introduces XBRL instance report parsing, unified model-family inference engines with KServe v2 API support, and several important fixes.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>XBRL Instance Report Parser</strong>: Now you can directly parse XBRL financial reports without external tools, streamlining financial document workflows.</li>
-<li><strong>Unified Model-Family Inference Engines</strong>: A single abstraction layer now handles image classification and other model families, simplifying model integration and supporting KServe v2 API for better deployment flexibility.</li>
-<li><strong>ASR Segment Fix</strong>: Prevents crashes when processing empty speech segments, improving robustness in audio transcription workflows.</li>
-<li><strong>Hyperlink Guard</strong>: Fixes potential crashes when processing Word documents with missing hyperlink addresses, enhancing document parsing reliability.</li>
+<li><strong>XBRL Instance Reports</strong>: Now you can parse XBRL financial reports directly, expanding Docling's document processing capabilities to include structured financial data formats.</li>
+<li><strong>Unified Model-Family Inference Engines</strong>: The new unified inference engine system supports image classification and integrates with KServe v2 API, providing a more consistent and scalable approach to model inference across different model families.</li>
+<li><strong>ASR Segment Fix</strong>: Skipping zero-length ASR segments prevents potential errors in speech recognition processing pipelines.</li>
+<li><strong>Hyperlink Address Guard</strong>: The fix for None hyperlink addresses in DOCX files prevents crashes when processing documents with broken links.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
-<pre class="codehilite"><code class="language-bash"># Update to the latest version
-pip install docling --upgrade
+<pre class="codehilite"><code class="language-python"># Try parsing an XBRL file
+from docling import DoclingDocument
 
-# Parse an XBRL file
-docling parse financial_report.xbrl
+doc = DoclingDocument.from_file(&quot;financial_report.xbrl&quot;)
+print(doc.parsed_content)
 
 # Use the new unified inference engine
-from docling.engine import UnifiedInferenceEngine
-engine = UnifiedInferenceEngine(model=&quot;image-classification&quot;)
-results = engine.predict(image_path)
+from docling.inference import ImageClassificationEngine
+
+engine = ImageClassificationEngine.from_preset(&quot;default&quot;)
+results = engine.predict(image_path=&quot;photo.jpg&quot;)
 </code></pre>
 
 <hr />
-                </div>
-            </article>
-            
-            <article class="repo-card">
-                <div class="repo-header">
-                    <h2><a href="https://github.com/mem0ai/mem0" target="_blank">mem0</a></h2>
-                    <div class="repo-meta">
-                        <span class="stars">★ 48005</span>
-                    </div>
-                </div>
-                <p class="repo-description">Universal memory layer for AI Agents</p>
-                <div class="changelog-summary">
-                    <h3>🚀 What's New</h3>
-<p>The latest update (v1.0.4) focuses on improving the OpenClaw plugin integration with Mem0, fixing auto-recall injection, and enhancing memory timestamp handling.</p>
-<h3>💡 Why It Matters</h3>
-<ul>
-<li><strong>OpenClaw plugin fixes</strong>: The auto-recall injection and auto-capture message drop issues have been resolved, ensuring more reliable memory persistence and retrieval when using OpenClaw agents with Mem0. This means your agents will now consistently remember and recall information across conversations.</li>
-<li><strong>Memory timestamp updates</strong>: The user-facing timestamp for memories has been improved, making it easier to track when memories were created or updated, which is crucial for debugging and understanding memory behavior.</li>
-</ul>
-<h3>🛠️ Try It Out</h3>
-<p>If you're using OpenClaw with Mem0, update to v1.0.4 to benefit from the fixed auto-recall functionality:</p>
-<pre class="codehilite"><code class="language-bash">pip install mem0ai/mem0@v1.0.4
-</code></pre>
-
-<p>Then, in your OpenClaw agent configuration, ensure you're using the latest Mem0 plugin to experience the improved memory persistence and recall.</p>
                 </div>
             </article>
             
@@ -305,27 +419,21 @@ results = engine.predict(image_path)
                 <p class="repo-description">Federated Query Engine for AI - The only MCP Server you'll ever need</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>MindsDB v26.0.0 brings significant improvements across SQL capabilities, integrations, and knowledge bases, along with critical security upgrades and bug fixes.</p>
+<p>MindsDB v26.0.0 brings significant improvements across SQL capabilities, integrations, and Knowledge Bases, along with critical security upgrades and bug fixes.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>SQL Enhancements</strong>: Fixes for <code>GROUP BY WITH ROLLUP</code> and improved memory handling with DuckDB make SQL queries more reliable and efficient, reducing errors and improving performance.</li>
-<li><strong>Integration Updates</strong>: Static READMEs from GitHub and improved handlers (Shopify, Confluence, Databricks, Hubspot, Netsuite) streamline setup and reduce local storage needs, making integrations easier to manage.</li>
-<li><strong>Knowledge Base Improvements</strong>: Switching to pgvector as the default store in Docker-compose and batching inserts by default enhance performance and scalability for knowledge base operations.</li>
-<li><strong>Security Upgrades</strong>: Updates to packages like urllib3, numpy, and others ensure the system is more secure and reliable, protecting against vulnerabilities.</li>
-<li><strong>Breaking Changes</strong>: The release includes breaking changes, so existing setups may need adjustments to maintain compatibility.</li>
+<li><strong>SQL Enhancements</strong>: Fixes for <code>GROUP BY WITH ROLLUP</code> and improved memory handling with DuckDB ensure more reliable and efficient query execution.</li>
+<li><strong>Integration Updates</strong>: Static READMEs from GitHub reduce local storage needs, while updated handlers (Shopify, Confluence, Databricks, Hubspot, Netsuite) improve user interactions.</li>
+<li><strong>Knowledge Base Improvements</strong>: Switching to pgvector in Docker-compose enhances performance, and batching inserts by default optimizes data handling.</li>
+<li><strong>Security Upgrades</strong>: Updates to packages like urllib3, starlette, numpy, and others ensure a safer and more reliable system.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
 <pre class="codehilite"><code class="language-bash"># Update to the latest version
 pip install mindsdb --upgrade
 
-# Test the new SQL features
-mindsdb --sql &quot;SELECT * FROM table GROUP BY WITH ROLLUP&quot;
-
-# Verify integration improvements
-# Check the updated handlers in your configuration
+# Test the new pgvector Knowledge Base store
+docker-compose up -d
 </code></pre>
-
-<hr />
                 </div>
             </article>
             
@@ -339,25 +447,26 @@ mindsdb --sql &quot;SELECT * FROM table GROUP BY WITH ROLLUP&quot;
                 <p class="repo-description">The programming language for agentic software. Build, run, and manage multi-agent systems at scale.</p>
                 <div class="changelog-summary">
                     <h3>🚀 What's New</h3>
-<p>Agnos v2.5.4 brings enhanced search capabilities, improved team collaboration, and better workflow control with Human-in-the-Loop (HITL) support.</p>
+<p>Agno v2.5.4 brings enhanced search capabilities, improved team collaboration, and better workflow control with human-in-the-loop features.</p>
 <h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>PgVector Similarity Threshold</strong>: Filter search results by minimum similarity score, giving you more control over vector search relevance.</li>
-<li><strong>Team Streaming Events</strong>: Real-time event emission during autonomous task execution improves visibility into team member activities.</li>
-<li><strong>Workflow HITL Support</strong>: Pause workflows at step level for user confirmation and input, enabling better human oversight in automated processes.</li>
-<li><strong>Metrics Redesign</strong>: Granular per-model and per-component tracking provides deeper insights into agent/team/workflow performance.</li>
-<li><strong>AWS Bedrock Credential Refresh</strong>: Automatic credential refresh prevents authentication failures in long-running workflows.</li>
+<li><strong>PgVector Similarity Threshold</strong>: Now you can filter search results by minimum similarity score, giving you more control over result quality and relevance.</li>
+<li><strong>Team Streaming Events</strong>: Real-time event emission during autonomous task execution makes team workflows more transparent and easier to debug.</li>
+<li><strong>Workflow Step-Level HITL</strong>: Pause workflows at individual steps for user confirmation or input, providing finer-grained control over automated processes.</li>
+<li><strong>Granular Metrics</strong>: The redesigned metrics system tracks per-model and per-component performance across the entire lifecycle, helping you optimize and debug more effectively.</li>
+<li><strong>AWS Bedrock Credential Refresh</strong>: Automatic credential refresh on every request prevents authentication failures in long-running workflows.</li>
 </ul>
 <h3>🛠️ Try It Out</h3>
-<pre class="codehilite"><code class="language-python"># Use PgVector similarity threshold
-from agno.knowledge import Knowledge
-knowledge = Knowledge(&quot;my_db&quot;, &quot;my_table&quot;)
-results = knowledge.search(
-    query=&quot;example&quot;,
+<pre class="codehilite"><code class="language-python"># Try the new PgVector similarity threshold
+from agno.vectordb.pgvector import PgVector
+
+vector_db = PgVector(
+    table_name=&quot;embeddings&quot;,
+    db_url=db_url,
     similarity_threshold=0.8  # Only return results with similarity &gt;= 0.8
 )
 
-# Enable workflow HITL at step level
+# Try workflow step-level HITL
 from agno.workflow import Workflow, Step
 from agno.agent import Agent
 
@@ -372,7 +481,7 @@ workflow = Workflow(
 </code></pre>
 
 <hr />
-<p><strong>Note</strong>: The changelog shows releases on 2026-02-24 (v2.5.4) and 2026-02-19 (v2.5.3), but no specific entry for 2026-02-25. The latest available version is v2.5.4.</p>
+<p><strong>Note</strong>: The changelog shows releases on 2026-02-24 (v2.5.4) and 2026-02-19 (v2.5.3), but no specific entry for 2026-02-25. The latest changes are from the v2.5.4 release.</p>
                 </div>
             </article>
             
@@ -380,7 +489,7 @@ workflow = Workflow(
     </main>
 
     <footer>
-        <p>Generated at 15:28 UTC • Powered by OpenRouter + GitHub API</p>
+        <p>Generated at 15:42 UTC • Powered by OpenRouter + GitHub API</p>
     </footer>
 </body>
 </html>
