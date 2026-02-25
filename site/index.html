@@ -1,54 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Wiki Insights 🧠 | The Voices of Morebath</title>
+    <title>AI Changelog Insights | 2026-02-25</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+        
+        // Init theme
+        const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', saved);
+    </script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Daily Wiki Insights</h1>
-            <p class="tagline">Uncovering the hidden stories behind today's featured article.</p>
-            <div class="date">February 25, 2026</div>
-        </header>
+    <header>
+        <div class="header-content">
+            <div class="title-group">
+                <h1>AI Changelog Insights</h1>
+                <p class="subtitle">Daily AI Updates for <span class="highlight">2026-02-25</span></p>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                🌗
+            </button>
+        </div>
+    </header>
+    
+    <main>
         
-        <main>
-            <article class="wiki-card ">
-                
-                <div class="card-background" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/The_Voices_of_Morebath_dust_cover.jpg/960px-The_Voices_of_Morebath_dust_cover.jpg');"></div>
-                
-                
-                <div class="card-header">
-                    <h2>The Voices of Morebath</h2>
-                </div>
-                
-                <div class="card-body">
-                    <div class="card-content">
-                        <div class="content">
-                            <h2>The Hook</h2>
-<p><strong>Did you know that the English Reformation—one of the most transformative events in British history—was once recorded in meticulous detail by a single village priest who kept track of everything from stolen communion wine to payments for men who joined a doomed rebellion?</strong> This isn't the story of kings and parliaments, but of a remote Devon parish where ordinary people lived through extraordinary times, their daily struggles and triumphs captured in the careful handwriting of one man.</p>
-<h2>The Story</h2>
-<p>In the tiny sheep-farming village of Morebath, twenty-five miles north of Exeter, a remarkable document survived the tumultuous 16th century: fifty-four years of parish accounts kept by Christopher Trychay, vicar from 1520 to 1574. Through Trychay's eyes, we witness England's transformation from a Catholic nation to a Protestant one, not through grand political narratives but through the lens of village life—the cost of candles, the brewing of church ales, and the heartbreaking moment when five Morebath men joined the Prayer Book Rebellion of 1549, only to face the consequences of England's bloodiest religious uprising.</p>
-<p>What makes this account extraordinary is Trychay himself—opinionated, eccentric, and deeply connected to his parishioners. His records weren't merely financial documents but a running commentary on village life, filled with gossip, complaints, and observations that bring Tudor England to vivid life. We learn how the parish's beloved church bells were confiscated as punishment for rebellion, how villagers struggled to adapt to new religious practices, and how a once-conservative Catholic community gradually accepted Protestant reforms under Elizabeth I.</p>
-<h2>Why It Matters Today</h2>
-<p><strong>The Voices of Morebath</strong> offers a powerful reminder that history isn't just about the powerful and famous—it's about how ordinary people navigate change, maintain community, and adapt to forces beyond their control. In our own era of rapid social transformation, Trychay's meticulous records show us that communities have always faced the challenge of preserving identity while adapting to new realities.</p>
-<p>The book also demonstrates the value of local history in understanding broader historical trends. Just as Morebath's story illuminates the English Reformation, our own communities today contain the seeds of larger cultural shifts that future historians will study. Moreover, Trychay's dedication to recording even the smallest details—from payments for minstrels to the cost of a roast lamb—reminds us that seemingly mundane records can become invaluable historical treasures, offering insights that official documents often miss.</p>
-<p>In an age of information overload, <strong>The Voices of Morebath</strong> shows us that sometimes the most profound historical insights come not from grand narratives but from the careful attention to everyday life that one devoted priest paid to his village over half a century.</p>
-                        </div>
-                        <div class="source">
-                            <a href="https://en.wikipedia.org/wiki/The_Voices_of_Morebath" target="_blank">Read the full article on Wikipedia →</a>
-                        </div>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/GreenhillEfka/pilotsuite-styx-ha" target="_blank">pilotsuite-styx-ha</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 0</span>
                     </div>
                 </div>
+                <p class="repo-description">PilotSuite — Styx: HACS Integration fuer Home Assistant. 80+ Sensoren, 15+ Dashboard Cards, 23 Core-Module, Zero-Config Setup, Multi-User Preference Learning.</p>
+                <div class="changelog-summary">
+                    <ul>
+<li>chore: sync HA integration version with Core <code>v8.4.1</code> line</li>
+<li>no functional HA code changes; compatibility release for paired install tracking</li>
+</ul>
+                </div>
             </article>
-        </main>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/GreenhillEfka/pilotsuite-styx-core" target="_blank">pilotsuite-styx-core</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 0</span>
+                    </div>
+                </div>
+                <p class="repo-description">PilotSuite — Styx: Privacy-first lokaler KI-Assistent fuer Home Assistant. Brain Graph, Habitus Pattern Learning, Mood Engine, LLM Provider Chain, Tool-Calling, Telegram Bot, MCP Server.</p>
+                <div class="changelog-summary">
+                    <p>The changelog contains multiple entries dated 2026-02-25:</p>
+<ol>
+<li><strong>Version 8.4.1</strong> - API Recovery + Compatibility Hardening</li>
+<li>Recovered full conversation API implementation with compatibility paths</li>
+<li>Added readiness endpoint and enriched version info with "Styx" name</li>
+<li>Fixed core app import failures and dashboard/API issues</li>
+<li>
+<p>Restored backward-compatible exports</p>
+</li>
+<li>
+<p><strong>Version 8.1.1</strong> - DEV LOOP #1: Branch Sync + Test Fixes</p>
+</li>
+<li>Implemented branch sync with origin/main and RFC-Phase 2 Core Tools</li>
+<li>Expanded test suite with smoke tests and anomaly detection</li>
+<li>
+<p>Fixed HASSFest configuration</p>
+</li>
+<li>
+<p><strong>Version 8.1.0</strong> - MCP Phase 2: Web Search + Test Suite</p>
+</li>
+<li>Added new APIs: input_number, zones, scene_patterns, routine_patterns, push_notifications</li>
+<li>Updated manifest and registered all new APIs in blueprint</li>
+<li>Fixed push notifications syntax error</li>
+</ol>
+<p>The most recent entry is 8.4.1, which represents the primary update for 2026-02-25 with API recovery and compatibility hardening improvements.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/Peuqui/AIfred-Intelligence" target="_blank">AIfred-Intelligence</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 22</span>
+                    </div>
+                </div>
+                <p class="repo-description">🎩 AIfred - Multi-Agent AI Assistant with TTS, RAG, Web Research & Voice capabilities. Supports Ollama, vLLM, TabbyAPI. Features AIfred/Sokrates/Salomo debate system.</p>
+                <div class="changelog-summary">
+                    <p><strong>VL Fast Path als SSOT</strong> — <code>chat_vl_direct()</code> aus <code>conversation_handler.py</code> entfernt. VL-Pfad in <code>_chat_mixin.py</code> nutzt jetzt <code>handle_own_knowledge()</code> direkt mit <code>agent="vision"</code> — kein duplizierter Inference-Code mehr. <strong><code>get_agent_num_ctx()</code> unterstützt "vision"</strong> — <code>context_utils.py</code>: <code>"vision"</code> als gültiger Agent hinzugefügt, liest <code>vision_num_ctx_enabled</code>/<code>vision_num_ctx</code> für Manual-Mode, XTTS-Reservation greift auch für VL. <strong>VL nutzte AIfred's Context statt Vision-Context</strong> — Behoben durch <code>agent="vision"</code> Routing. <strong>Toter <code>state=None</code>-Zweig in <code>handle_own_knowledge()</code></strong> — Unerreichbarer Fallback-Code mit veralteten Imports entfernt. <strong>llm_history Duplikat-Eintrag bei VL ohne Response</strong> — <code>_chat_mixin.py</code>: Längenvergleich statt Role-Check verhindert falsche AI-Response-Erkennung. <strong><code>title_num_ctx</code> hardcoded 32768 bei VL</strong> — <code>_session_mixin.py</code>: Titelgenerierung nutzt jetzt <code>get_agent_num_ctx("vision", ...)</code>, vermeidet Ollama-Modell-Reload durch Context-Mismatch. <strong>Debug-Labels zeigten "AIFRED" für VL</strong> — <code>own_knowledge_handler.py</code>: <code>agent_label</code> dynamisch (<code>AIFRED</code>/<code>VISION</code>), <code>source_label</code> zeigt <code>VL (model)</code> statt <code>Own Knowledge (model)</code>. <strong><code>cleanup_vram_cache</code> in autoscan löschte Ollama/vLLM-Kalibrierungen</strong> — Jetzt nur noch <code>backend == "llamacpp"</code> Einträge bereinigt. <strong><code>update_vram_cache</code> Schema-Mismatch</strong> — <code>llama-swap-autoscan.py</code>: fehlende Model-Level-Felder <code>quantization</code>, <code>model_size_gb</code>, <code>gguf_path</code> ergänzt. <strong>KV-Cache Anzeige <code>?</code> statt <code>f16</code></strong> — <code>llamacpp_calibration.py</code>: Zeigt jetzt <code>KV-Cache: f16</code>.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/mikhashev/dpc-messenger" target="_blank">dpc-messenger</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 8</span>
+                    </div>
+                </div>
+                <p class="repo-description">D-PC Messenger, a decentralized, Privacy-First Platform for Human-AI Collaboration.</p>
+                <div class="changelog-summary">
+                    <p>The changelog contains an entry dated 2026-02-25. Here is the summary:</p>
+<p><strong>D-PC Messenger 0.18.0 (2026-02-25)</strong> introduces the Embedded Autonomous AI Agent (DPC Agent) with 40+ tools, background consciousness, and self-modification capabilities. Major features include Agent Telegram Integration for two-way messaging and voice transcription, Reasoning Model Support (DPTP v1.4) with DeepSeek R1, Claude Extended Thinking, and OpenAI o1/o3, Remote Peer Inference Enhancements with provider discovery and configurable timeouts, and Real-time AI Response Streaming with token-by-token display. The release also includes Z.AI provider enhancements, Firewall improvements with granular agent permissions, UI improvements, and numerous bug fixes across voice transcription, tool handling, and configuration management.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/deconvolute-labs/deconvolute" target="_blank">deconvolute</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 2</span>
+                    </div>
+                </div>
+                <p class="repo-description">Real-time security layer protecting AI Agents from Confused Deputy attacks, malicious MCP payloads, and Indirect Prompt Injection.</p>
+                <div class="changelog-summary">
+                    <p>Add regression tests to track and validate changes against upstream mcp sdk</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/Tsukumi233/hotaru-code" target="_blank">hotaru-code</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 1</span>
+                    </div>
+                </div>
+                <p class="repo-description">Hotaru Code 用于在终端中提供 AI 编码助手能力。  支持 TUI，并具备SubAgent、工具调用、权限控制、MCP 扩展等能力。</p>
+                <div class="changelog-summary">
+                    <p>Add reasoning_text handling in ProviderTransform and update related processing logic, extend web command with logging options for level, format, and access log, refactor diagnostics handling and add debounce logic, enhance model state management with persistence option, enhance provider and session handling with strict schema validation, enhance schema normalization by removing titles and flattening nullable types, introduce ToolResolver for effective tool resolution and refactor session processing, implement runtime logging configuration and bootstrap logic, add text sanitization and error handling in streaming process, add fallback logic for interleaved field in message transformation and enhance related tests, add provider configuration application and related tests, refactor provider connection payload structure and update related tests, implement instance context management and runtime binding helpers, add text sanitization for control characters in OpenAI SDK and session processor, add access logging middleware and enhance server startup logging, add session index management and related tests, update agent and config to remove legacy fields, refactor related tests, update max_tokens to use ProviderTransform constant and enhance prompt verbosity examples, enhance timeout configuration for AsyncClient, guard pending queue against concurrent replies, replace KeyError 404 mapping with explicit NotFoundError, re-raise unexpected turn errors, move API server lifecycle management to CLI.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/openlayer-ai/openlayer-python" target="_blank">openlayer-python</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 16</span>
+                    </div>
+                </div>
+                <p class="repo-description">The official Python library for Openlayer, the Continuous Model Improvement Platform for AI. 📈</p>
+                <div class="changelog-summary">
+                    <p>The changelog contains an entry dated 2026-02-25 for version 0.17.8. This release includes a single chore: making the <code>test_proxy_environment_variables</code> more resilient to environment conditions, implemented via commit <a href="https://github.com/openlayer-ai/openlayer-python/commit/ad5b39e8b878c8b4737ad49e0f4e66d7a593c0d8">ad5b39e</a>.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/protocontext/protocontext" target="_blank">protocontext</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 2</span>
+                    </div>
+                </div>
+                <p class="repo-description">Deterministic knowledge layer for RAG systems.  Open standard + search engine + semantic retrieval for AI-readable web content.</p>
+                <div class="changelog-summary">
+                    <p><strong>PCE (ProtoContext Extension)</strong>: Structured data blocks for products, rooms, tours, actions, policies; <strong>Unified <code>content_type</code> system</strong>: Single field for all content classification; <strong>WooCommerce deep integration</strong>: PCE product blocks with PRODUCT_ID, PRICE, CURRENCY, STOCK_STATUS, PURCHASE_URL, ACTION; <strong>Variable product support</strong>: Lists all WooCommerce variations with attributes and pricing; <strong>WooCommerce category pages</strong>: <code>/context/shop/{category}.txt</code> route; <strong>Industry auto-detection</strong>: Auto-detects ecommerce (WooCommerce), configurable for hospitality, tours, etc.; <strong><code>@content_type</code> and <code>@industry</code> metadata</strong> on all context files; <strong><code>@currency</code> metadata</strong> for ecommerce sites; <strong>Registry sync on startup</strong>: Cleans stale domains not found in Typesense; <strong>Multi-provider AI support</strong>: Gemini, OpenAI, or OpenRouter for content conversion; <strong>OpenRouter integration</strong>: Access hundreds of AI models with a single API key; <strong>Sitemap scraping</strong>: Index any website via sitemap.xml; <strong>llms.txt support</strong>: Convert llms.txt/llms-full.txt to context.txt format; <strong>Language-aware scraping</strong>: Detects and filters multilingual sites; <strong>Admin dashboard</strong>: Next.js web UI with search, submit, stats, API key management; <strong>Auth system</strong>: Setup wizard, login, session tokens, API keys; <strong>MCP server</strong>: Connect ProtoContext to any AI agent via Model Context Protocol; <strong>WordPress plugin</strong>: Auto-generates context.txt from pages, posts, products; <strong>Validator</strong>: Python + JavaScript validators for context.txt format; <strong>Architecture</strong>: Engine: FastAPI + Typesense (semantic search via all-MiniLM-L12-v2); Dashboard: Next.js 16 + shadcn/ui v4 + Tailwind CSS; MCP Server: Python MCP SDK; WordPress Plugin: PHP 7.4+, WooCommerce compatible; Docker Compose for local development.</p>
+                </div>
+            </article>
+            
+            <article class="repo-card">
+                <div class="repo-header">
+                    <h2><a href="https://github.com/Qredence/fleet-rlm" target="_blank">fleet-rlm</a></h2>
+                    <div class="repo-meta">
+                        <span class="stars">★ 21</span>
+                    </div>
+                </div>
+                <p class="repo-description">DSPy's Recursive Language Model (RLM) with Modal Sandbox for secure cloud-based code execution</p>
+                <div class="changelog-summary">
+                    <p>[Summary Paragraph] The changelog contains an entry dated 2026-02-24 (version 0.4.8) with significant updates including milestone completion across foundation hardening, DB/schema enablers, Canvas UX delivery, telemetry propagation, and live integration validation. Key additions include Codex multi-agent delivery bootstrap, deterministic RLM mock trajectory assessment, RLM/DSPy + Modal infrastructure persistence schema, Canvas graph/timeline/preview features, and AI Elements chat QA + renderer hardening. Changes include backend architecture refactoring, settings surface simplification, and standardized telemetry defaults. Fixes address reasoning stream formatting and telemetry preference propagation. The release also includes 5 merged pull requests and implements 23 milestone issues.</p>
+                </div>
+            </article>
+            
         
-        <footer>
-            <p>Curated by AI • Powered by OpenRouter + Wikipedia</p>
-        </footer>
-    </div>
+    </main>
+
+    <footer>
+        <p>Generated at 15:08 UTC • Powered by OpenRouter + GitHub API</p>
+    </footer>
 </body>
 </html>
