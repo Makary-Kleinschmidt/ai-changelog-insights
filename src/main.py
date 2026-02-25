@@ -13,6 +13,75 @@ except ImportError:
     from src.github_client import yield_active_ai_repos
     from src.summarizer import check_for_daily_update
 
+def format_summary_html(data: dict) -> str:
+    """
+    Converts the JSON summary data into the HTML format expected by the template.
+    """
+    html = []
+    
+    # What's New
+    html.append(f"<h3>🚀 What's New</h3>")
+    html.append(f"<p>{data.get('summary', '')}</p>")
+    
+    # Why It Matters
+    if data.get('impact'):
+        html.append(f"<h3>💡 Why It Matters</h3>")
+        html.append("<ul>")
+        for item in data['impact']:
+            name = item.get('name', 'Feature')
+            desc = item.get('description', '')
+            html.append(f"<li><strong>{name}</strong>: {desc}</li>")
+        html.append("</ul>")
+        
+    # Try It Out
+    if data.get('try_it_out'):
+        tio = data['try_it_out']
+        lang = tio.get('language', '')
+        code = tio.get('code', '')
+        if code:
+            html.append(f"<h3>🛠️ Try It Out</h3>")
+            # Using pre/code block. 
+            # Note: We are manually building HTML, so we need to escape generic content if we were paranoid,
+            # but usually LLM output is controlled. 
+            # Ideally use markdown for code to get highlighting if we process it later, 
+            # but here we are constructing final HTML.
+            # Let's wrap in markdown code block and use markdown lib to render it to ensure syntax highlighting works?
+            # Or just raw <pre><code>. The existing CSS targets pre/code.
+            html.append(f"<pre><code class=\"language-{lang}\">{code}</code></pre>")
+            
+    return "\n".join(html)
+
+def generate_rss_feed(repos, target_date_str):
+    """Generates an RSS feed for the updates."""
+    rss_template = """<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>AI Changelog Insights</title>
+  <link>https://ai-changelog-insights.github.io</link>
+  <description>Daily AI updates, summarized for developers.</description>
+  <atom:link href="https://ai-changelog-insights.github.io/feed.xml" rel="self" type="application/rss+xml" />
+  <language>en-us</language>
+  <lastBuildDate>{{ build_date }}</lastBuildDate>
+  {% for repo in repos %}
+  <item>
+    <title>{{ repo.name }} - {{ repo.title }}</title>
+    <link>{{ repo.url }}</link>
+    <description><![CDATA[
+      {{ repo.summary_html }}
+    ]]></description>
+    <guid isPermaLink="false">{{ repo.full_name }}-{{ repo.update_date }}</guid>
+    <pubDate>{{ repo.pub_date }}</pubDate>
+  </item>
+  {% endfor %}
+</channel>
+</rss>
+"""
+    t = Template(rss_template)
+    return t.render(
+        repos=repos,
+        build_date=datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    )
+
 def generate_site(target_date_str: str = None):
     if not target_date_str:
         target_date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -51,47 +120,51 @@ def generate_site(target_date_str: str = None):
             continue
             
         # Check Today
-        summary_today = check_for_daily_update(repo_data['changelog'], dates_to_check[0])
+        summary_data = check_for_daily_update(repo_data['changelog'], dates_to_check[0])
         
-        if summary_today and summary_today != "NO_UPDATE":
-            print(f"  ✅ FOUND UPDATE for {dates_to_check[0]}!")
-            summary_html = markdown.markdown(summary_today, extensions=['extra', 'codehilite'])
+        found_date = dates_to_check[0]
+        is_fresh = True
+        
+        if not summary_data:
+            # Check Yesterday (Fallback)
+            print(f"  -> No update for {dates_to_check[0]}. Checking {dates_to_check[1]}...")
+            summary_data = check_for_daily_update(repo_data['changelog'], dates_to_check[1])
+            found_date = dates_to_check[1]
+            is_fresh = False
             
-            primary_list.append({
+        if summary_data:
+            print(f"  ✅ FOUND UPDATE for {found_date}!")
+            
+            # Convert JSON to HTML
+            summary_html = format_summary_html(summary_data)
+            
+            # Prepare repo object
+            repo_entry = {
                 "name": repo_data['name'],
                 "full_name": repo_data['full_name'],
                 "description": repo_data['description'],
                 "url": repo_data['url'],
                 "stars": repo_data['stars'],
                 "summary_html": summary_html,
-                "update_date": dates_to_check[0],
-                "is_fresh": True
-            })
-        else:
-            # Check Yesterday (Fallback)
-            print(f"  -> No update for {dates_to_check[0]}. Checking {dates_to_check[1]}...")
-            summary_yesterday = check_for_daily_update(repo_data['changelog'], dates_to_check[1])
+                "update_date": found_date,
+                "is_fresh": is_fresh,
+                "title": summary_data.get('title', 'Update'),
+                # For RSS
+                "pub_date": datetime.strptime(found_date, "%Y-%m-%d").strftime("%a, %d %b %Y 00:00:00 GMT")
+            }
             
-            if summary_yesterday and summary_yesterday != "NO_UPDATE":
-                print(f"  ⚠️ FOUND OLDER UPDATE for {dates_to_check[1]}")
-                summary_html = markdown.markdown(summary_yesterday, extensions=['extra', 'codehilite'])
-                
-                secondary_list.append({
-                    "name": repo_data['name'],
-                    "full_name": repo_data['full_name'],
-                    "description": repo_data['description'],
-                    "url": repo_data['url'],
-                    "stars": repo_data['stars'],
-                    "summary_html": summary_html,
-                    "update_date": dates_to_check[1],
-                    "is_fresh": False
-                })
+            if is_fresh:
+                primary_list.append(repo_entry)
             else:
-                 print("  -> No recent updates found.")
+                print(f"  ⚠️ Found older update for {found_date}")
+                secondary_list.append(repo_entry)
+        else:
+             print("  -> No recent updates found.")
 
-        # Check termination condition
-        if len(primary_list) >= MAX_REPOS:
-            print(f"🎉 Secured {MAX_REPOS} fresh updates!")
+        # Check termination condition (including both fresh and recent updates)
+        total_secured = len(primary_list) + len(secondary_list)
+        if total_secured >= MAX_REPOS:
+            print(f"🎉 Secured {MAX_REPOS} updates (Fresh: {len(primary_list)}, Recent: {len(secondary_list)})!")
             break
             
         if checked_count >= CHECK_LIMIT:
@@ -121,8 +194,22 @@ def generate_site(target_date_str: str = None):
             generated_at=datetime.now(timezone.utc).strftime("%H:%M UTC")
         )
         
+        # Write Main Index
         with open("site/index.html", "w", encoding="utf-8") as f:
             f.write(html)
+            
+        # Write Archive
+        os.makedirs("site/archives", exist_ok=True)
+        archive_path = f"site/archives/{target_date_str}.html"
+        with open(archive_path, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"📦 Archived to {archive_path}")
+        
+        # Write RSS Feed
+        rss_xml = generate_rss_feed(final_repos, target_date_str)
+        with open("site/feed.xml", "w", encoding="utf-8") as f:
+            f.write(rss_xml)
+        print("📡 RSS Feed generated.")
             
         # 3. Save metadata
         with open("site/meta.json", "w", encoding="utf-8") as f:
@@ -137,6 +224,8 @@ def generate_site(target_date_str: str = None):
         
     except Exception as e:
         print(f"❌ Error generating site: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

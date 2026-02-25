@@ -6,14 +6,14 @@ try:
 except ImportError:
     import config
 
-def check_for_daily_update(content: str, target_date: str) -> str:
+def check_for_daily_update(content: str, target_date: str) -> dict:
     """
-    Checks if there is an update for the target_date and returns summary or 'NO_UPDATE'.
+    Checks if there is an update for the target_date and returns a dictionary.
     """
     api_key = os.getenv('OPENROUTER_API_KEY') or config.OPENROUTER_API_KEY
     if not api_key:
         print("Warning: OPENROUTER_API_KEY not found.")
-        return "NO_UPDATE"
+        return None
 
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -22,8 +22,22 @@ def check_for_daily_update(content: str, target_date: str) -> str:
         "X-Title": "AI Changelog Insights"
     }
     
-    # Truncate content to avoid token limits (keep top 8000 chars where latest updates usually are)
-    truncated_content = content[:8000]
+    # 1. Local Pre-check (Cost Saving)
+    if target_date not in content:
+        print(f"  📉 Local optimization: '{target_date}' not found in changelog. Skipping LLM.")
+        return None
+
+    # 2. Extract relevant section (Token Saving)
+    # Find the date index
+    idx = content.find(target_date)
+    
+    # Start context 500 chars before (to catch the header like "## v1.2.3 (2026-02-25)")
+    start_idx = max(0, idx - 500)
+    
+    # End context: Take next 2000 chars (enough for a summary)
+    end_idx = min(len(content), idx + 2000)
+    
+    truncated_content = content[start_idx:end_idx]
     
     prompt = config.CHANGELOG_UPDATE_CHECK_PROMPT.format(
         content=truncated_content,
@@ -35,7 +49,7 @@ def check_for_daily_update(content: str, target_date: str) -> str:
         "messages": [
             {
                 "role": "system",
-                "content": "You are a precise technical changelog parser."
+                "content": "You are a precise technical changelog parser that outputs only valid JSON."
             },
             {
                 "role": "user", 
@@ -43,7 +57,8 @@ def check_for_daily_update(content: str, target_date: str) -> str:
             }
         ],
         "temperature": 0.1, # Very low temp for strict parsing
-        "max_tokens": 500
+        "response_format": {"type": "json_object"},
+        "max_tokens": 1000
     }
     
     try:
@@ -57,16 +72,25 @@ def check_for_daily_update(content: str, target_date: str) -> str:
         
         choices = response.json().get("choices", [])
         if not choices:
-            return "NO_UPDATE"
+            return None
             
-        result = choices[0]["message"]["content"].strip()
+        result_text = choices[0]["message"]["content"].strip()
         
-        # Basic validation
-        if "NO_UPDATE" in result:
-            return "NO_UPDATE"
+        # Clean up if markdown code block is present
+        if result_text.startswith("```json"):
+            result_text = result_text[7:-3].strip()
+        elif result_text.startswith("```"):
+            result_text = result_text[3:-3].strip()
             
-        return result
+        try:
+            data = json.loads(result_text)
+            if not data.get("update_found"):
+                return None
+            return data
+        except json.JSONDecodeError:
+            print(f"Failed to parse JSON from LLM: {result_text[:100]}...")
+            return None
         
     except Exception as e:
         print(f"Error calling OpenRouter: {e}")
-        return "NO_UPDATE"
+        return None
