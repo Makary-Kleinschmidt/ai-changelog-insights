@@ -1,6 +1,10 @@
 # scripts/run_daily.ps1
 $ErrorActionPreference = "Stop"
 
+# Set encoding to UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$env:PYTHONUTF8 = "1"
+
 # Get the directory of this script
 $ScriptPath = $PSScriptRoot
 # Go up one level to project root
@@ -9,14 +13,22 @@ $ProjectRoot = Split-Path $ScriptPath -Parent
 # Set location to project root
 Set-Location $ProjectRoot
 
+# Ensure logs directory exists
+$LogDir = Join-Path $ProjectRoot "logs"
+if (-not (Test-Path $LogDir)) {
+    New-Item -ItemType Directory -Path $LogDir | Out-Null
+}
+
 # Log file path
-$LogFile = Join-Path $ProjectRoot "logs\daily_update.log"
+$LogFile = Join-Path $LogDir "daily_update.log"
 
 # Function to log messages
 function Write-Log {
     param ([string]$Message)
     $TimeStamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Add-Content -Path $LogFile -Value "[$TimeStamp] $Message"
+    $LogMsg = "[$TimeStamp] $Message"
+    Add-Content -Path $LogFile -Value $LogMsg
+    Write-Host $LogMsg -ForegroundColor Cyan
 }
 
 Write-Log "Starting daily update..."
@@ -25,22 +37,35 @@ try {
     # Check if uv is available
     if (Get-Command "uv" -ErrorAction SilentlyContinue) {
         Write-Log "Found uv, running update..."
-        # Capture output and append to log
-        uv run src/main.py *>> $LogFile
+        
+        # Run update command and capture output to both console and log
+        # 2>&1 redirects stderr to stdout so Tee-Object captures both
+        uv run src/main.py 2>&1 | Tee-Object -FilePath $LogFile -Append
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Update script failed with exit code $LASTEXITCODE"
+        }
+        
         Write-Log "Update command completed."
         
         # Git operations
         Write-Log "Starting Git operations..."
         
-        # Check for changes
-        if (git status --porcelain) {
+        # Check for changes in site directory specifically
+        if (git status --porcelain site/) {
             git add site/
             git commit -m "Daily content update: $(Get-Date -Format 'yyyy-MM-dd')"
-            git push origin main # Change 'main' if your branch is different
+            
+            # Push changes
+            git push origin main 2>&1 | Tee-Object -FilePath $LogFile -Append
+            if ($LASTEXITCODE -ne 0) {
+                throw "Git push failed. Please ensure 'origin' remote is configured."
+            }
+            
             Write-Log "Changes pushed to GitHub successfully."
         }
         else {
-            Write-Log "No changes detected to commit."
+            Write-Log "No changes detected in site/ directory to commit."
         }
     }
     else {

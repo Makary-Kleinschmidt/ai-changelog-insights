@@ -109,11 +109,18 @@ def generate_rss_feed(repos, target_date_str):
         build_date=datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
     )
 
-def generate_site(target_date_str: str = None):
+def generate_site(target_date_str: str = None, force: bool = False):
     if not target_date_str:
         target_date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         
     print(f"🚀 Starting Real-Time AI Changelog Aggregation for {target_date_str}...")
+    
+    # Check if already generated
+    archive_path = f"site/archives/{target_date_str}.html"
+    if os.path.exists(archive_path) and not force:
+        print(f"✨ Site for {target_date_str} is already up to date. Skipping generation.")
+        print("💡 Use --force to regenerate.")
+        return
     
     processed_repos = []
     MAX_REPOS = 9
@@ -265,6 +272,7 @@ def generate_site(target_date_str: str = None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", help="Target date YYYY-MM-DD", default=None)
+    parser.add_argument("--force", help="Force regeneration", action="store_true")
     args = parser.parse_args()
     
-    generate_site(args.date)
+    generate_site(args.date, args.force)
