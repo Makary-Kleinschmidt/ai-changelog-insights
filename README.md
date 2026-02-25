@@ -2,6 +2,8 @@
 
 A real-time, autonomous dashboard that aggregates and summarizes daily updates from top-performing AI repositories.
 
+https://makary-kleinschmidt.github.io/ai-changelog-insights/
+
 ## 🚀 Key Features
 
 -   **Real-Time Aggregation**: Fetches fresh data directly from GitHub API, bypassing caches.
