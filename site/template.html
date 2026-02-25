@@ -35,6 +35,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             const summaries = document.querySelectorAll('.changelog-summary');
             
+            // Add Copy Buttons to Code Blocks
+            document.querySelectorAll('pre').forEach(pre => {
+                // Check if button already exists (in case of re-runs)
+                if (pre.querySelector('.copy-btn')) return;
+
+                const button = document.createElement('button');
+                button.className = 'copy-btn';
+                button.textContent = 'Copy';
+                button.setAttribute('aria-label', 'Copy code to clipboard');
+
+                button.addEventListener('click', () => {
+                    const code = pre.querySelector('code');
+                    const text = code ? code.innerText : pre.innerText;
+                    
+                    navigator.clipboard.writeText(text).then(() => {
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        button.classList.add('copied');
+                        
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.classList.remove('copied');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy:', err);
+                        button.textContent = 'Error';
+                    });
+                });
+
+                pre.appendChild(button);
+            });
+            
             summaries.forEach(summary => {
                 const children = Array.from(summary.children);
                 if (children.length === 0) return;

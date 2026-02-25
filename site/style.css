@@ -234,6 +234,7 @@ main {
     white-space: pre-wrap; 
     word-wrap: break-word;
     max-width: 100%;
+    position: relative; /* For copy button positioning */
 }
 
 .changelog-summary code {
@@ -246,6 +247,43 @@ main {
     /* Ensure inline code also behaves well */
     white-space: pre-wrap;
     word-break: break-all;
+}
+
+/* Copy Button Styles */
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s ease;
+    opacity: 0; /* Hidden by default */
+}
+
+[data-theme="dark"] .copy-btn {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: var(--text);
+}
+
+.changelog-summary pre:hover .copy-btn {
+    opacity: 1; /* Show on hover */
+}
+
+.copy-btn:hover {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.copy-btn.copied {
+    background-color: #27ae60;
+    color: white;
+    border-color: #27ae60;
 }
 
 /* Adjust lists inside summary */
@@ -289,4 +327,5 @@ footer {
 @media (max-width: 600px) {
     h1 { font-size: 1.5rem; }
     .repo-card { padding: 1rem; }
+    .copy-btn { opacity: 1; } /* Always show on mobile since no hover */
 }

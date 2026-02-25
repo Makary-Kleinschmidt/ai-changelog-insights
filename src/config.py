@@ -37,7 +37,11 @@ Instructions:
     -   Users want to know **strictly what to do** with the update.
     -   Avoid abstract descriptions like "Improved performance" or "Fixed bugs". Be specific: "Fixed memory leak in vector search".
     -   **What's New**: A detailed technical summary.
-    -   **Why It Matters**: Explain the practical benefit. "Faster queries" -> "Reduces latency by 50% for RAG pipelines".
+    -   **Why It Matters**: Explain the practical benefit IN DEPTH. This section should be detailed and comprehensive (at least 3-4 sentences per item).
+        -   Provide context on the problem being solved.
+        -   Compare "before" vs "after" scenarios.
+        -   Explain *why* this is important for the user's workflow or application.
+        -   Example: Instead of just "Faster queries", say "Previously, vector search on large datasets could take seconds. This update introduces a new indexing algorithm that reduces latency by 50% for RAG pipelines, making real-time applications viable."
     -   **Try It Out**: THIS IS THE MOST IMPORTANT SECTION. Provide a **valid, copy-pasteable code snippet** or CLI command that demonstrates the new feature.
         -   If it's a library (Python/JS), show a code example using the new API.
         -   If it's a tool, show the command line usage.
