@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>AI Changelog Insights</title>
+  <link>https://ai-changelog-insights.github.io</link>
+  <description>Daily AI updates, summarized for developers.</description>
+  <atom:link href="https://ai-changelog-insights.github.io/feed.xml" rel="self" type="application/rss+xml" />
+  <language>en-us</language>
+  <lastBuildDate>Wed, 25 Feb 2026 18:56:36 GMT</lastBuildDate>
+  
+  <item>
+    <title>langchain - langchain-core==1.2.16</title>
+    <link>https://github.com/langchain-ai/langchain</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release includes two key fixes: improved handling of empty tool chunk IDs during merge operations and a version bump to 1.2.16.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Fix empty tool chunk ID handling</strong>: Previously, empty tool chunk IDs were not properly handled during merge operations, which could lead to unexpected behavior or errors. This fix ensures that empty tool chunk IDs are treated as missing values, preventing potential crashes and ensuring more robust tool call processing in agent workflows.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from langchain_core.tools import merge_tool_calls
+
+# Example showing improved handling of empty chunk IDs
+tool_calls = [
+    {'name': 'tool1', 'arguments': '{}', 'id': '123'},
+    {'name': 'tool2', 'arguments': '{}', 'id': ''}  # Previously problematic empty ID
+]
+
+# The merge operation now handles empty IDs gracefully
+merged = merge_tool_calls(tool_calls)
+print(merged)</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">langchain-ai/langchain-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>anthropic-sdk-python - v0.84.0 - MCP Tools, Prompts, and Resources Conversion Helpers</title>
+    <link>https://github.com/anthropics/anthropic-sdk-python</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces conversion helpers for MCP tools, prompts, and resources, along with several API improvements and internal optimizations. The SDK has been rebranded to 'Claude SDK' with a streamlined README.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>MCP Tools, Prompts, and Resources Conversion Helpers</strong>: Developers can now easily convert between MCP tools, prompts, and resources using the new helper functions. This simplifies integration with Model Context Protocol (MCP) servers and enables seamless data transformation between different formats. Previously, developers had to manually handle these conversions, which was error-prone and time-consuming.</li>
+<li><strong>Array Format Changed to Brackets</strong>: The API now uses bracket notation for array parameters instead of the previous format. This aligns with standard HTTP conventions and improves compatibility with various HTTP clients and proxies. The change ensures more predictable behavior when sending array parameters in API requests.</li>
+<li><strong>Publishing Section Removed from CLI Target</strong>: The CLI target no longer includes the publishing section, streamlining the command-line interface and reducing complexity. This change makes the CLI more focused on core functionality and improves the user experience for developers who primarily use the SDK through code rather than the CLI.</li>
+<li><strong>Top-Level Cache Control Added</strong>: Automatic caching is now available at the top level, allowing developers to easily enable caching for API responses. This improves performance by reducing redundant API calls and enables better resource utilization. The cache control can be configured globally or per-request, providing flexibility for different use cases.</li>
+<li><strong>SDK Rebranded to Claude SDK</strong>: The SDK has been rebranded from 'Anthropic SDK' to 'Claude SDK' with a streamlined README. This change reflects the product's evolution and provides clearer branding for users. The updated documentation makes it easier for new users to get started and understand the SDK's capabilities.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from anthropic import Anthropic
+from anthropic.helpers import convert_mcp_tool, convert_mcp_prompt, convert_mcp_resource
+
+# Initialize client
+client = Anthropic()
+
+# Convert MCP tool to SDK format
+mcp_tool = {
+    "name": "search",
+    "description": "Search documents",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "query": {"type": "string"}
+        }
+    }
+}
+converted_tool = convert_mcp_tool(mcp_tool)
+
+# Convert MCP prompt to SDK format
+mcp_prompt = {
+    "name": "summarize",
+    "description": "Summarize text",
+    "prompt": "Please summarize the following text: {text}"
+}
+converted_prompt = convert_mcp_prompt(mcp_prompt)
+
+# Convert MCP resource to SDK format
+mcp_resource = {
+    "name": "document",
+    "description": "Document content",
+    "content": "This is a sample document."
+}
+converted_resource = convert_mcp_resource(mcp_resource)
+
+# Use with API
+messages = [
+    {"role": "user", "content": "Search for information about MCP tools"},
+    {"role": "tool", "name": converted_tool.name, "input": {"query": "MCP tools"}}
+]
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1000,
+    messages=messages,
+    cache_control={"type": "ephemeral"}  # Use top-level cache control
+)
+
+print(response.content)</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">anthropics/anthropic-sdk-python-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>ragflow - RAGFlow v0.24.0</title>
+    <link>https://github.com/infiniflow/ragflow</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>RAGFlow 0.24.0 introduces comprehensive memory management capabilities, enhanced agent chat interfaces, improved dataset governance, and expanded ecosystem support. The release focuses on observability, developer integration, and real-world deployment challenges.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Memory Management API</strong>: Previously, memory operations were opaque and difficult to integrate programmatically. This release introduces RESTful APIs and Python SDK for comprehensive memory CRUD operations, intelligent retrieval via keyword and semantic similarity searches, and session-based organization. Developers can now seamlessly integrate memory persistence into conversational applications without building custom backends.</li>
+<li><strong>Memory Extraction Logging</strong>: Memory extraction was previously a black-box process with no visibility into failures or performance bottlenecks. The new console displays extraction status, processing steps, success/failure indicators, and timestamps for every memory operation. This observability enables developers to debug memory pipeline issues, optimize extraction parameters, and ensure reliable memory persistence in production deployments.</li>
+<li><strong>Agent Chat Management Interface</strong>: Agent interactions were previously limited to embedded pages or custom frontend development. The new chat interface provides a consistent, session-preserving conversation management system with a dedicated Launch button. All dialogue histories are retained, enabling users to resume conversations, review past interactions, and maintain context across sessions without losing conversation state.</li>
+<li><strong>Multi-Sandbox Support</strong>: Agent execution was previously constrained to single sandbox environments. The new multi-Sandbox mechanism supports local gVisor and Alibaba Cloud with mainstream Sandbox API compatibility. This enables secure, isolated agent execution across different deployment environments while maintaining consistent API interfaces for containerized applications and cloud deployments.</li>
+<li><strong>Batch Metadata Management</strong>: Metadata configuration for multiple files was previously a manual, file-by-file process. The new batch management capability allows users to configure metadata across multiple documents simultaneously, dramatically reducing setup time for large knowledge bases and ensuring consistent metadata application across entire document collections.</li>
+<li><strong>Enhanced Chat Retrieval Strategies</strong>: Deep-research scenarios previously suffered from poor recall accuracy due to suboptimal retrieval strategies. The optimized retrieval algorithms improve recall rates, ensuring more relevant documents are retrieved for complex queries. This enhancement is critical for applications requiring comprehensive information synthesis from large knowledge bases.</li>
+<li><strong>Model Connection Testing</strong>: Adding new models previously required trial-and-error to verify connectivity and configuration. The new model connection test feature validates model endpoints, authentication, and configuration parameters before deployment, preventing runtime failures and ensuring reliable model integration in production environments.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from ragflow import MemoryClient
+
+# Initialize memory client
+client = MemoryClient(
+    endpoint='http://localhost:8000',
+    api_key='your_api_key'
+)
+
+# Create a new memory
+memory = client.create_memory(
+    name='customer_conversation',
+    description='Customer support interactions'
+)
+
+# Add memory entry
+entry = memory.add_entry(
+    content='User asked about refund policy',
+    metadata={'user_id': '12345', 'timestamp': '2026-02-25T10:00:00Z'},
+    tags=['support', 'refund']
+)
+
+# Retrieve memories by keyword
+results = client.search_memories(
+    query='refund policy',
+    session_id='support_session_1'
+)
+
+print(f'Found {len(results)} relevant memories')
+for result in results:
+    print(f'- {result.content[:100]}...')
+
+# Update memory entry
+entry.update(metadata={'status': 'resolved'})
+
+# Delete memory
+memory.delete()</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">infiniflow/ragflow-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>mindsdb - v26.0.0 - Major Release with Breaking Changes</title>
+    <link>https://github.com/mindsdb/mindsdb</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces significant improvements across SQL capabilities, integrations, Knowledge Bases, and security. Key highlights include fixes for GROUP BY WITH ROLLUP, enhanced memory handling with DuckDB, static README integration, pgvector as default Knowledge Base store, and numerous security upgrades. The release also deprecates several handlers and introduces breaking changes.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>GROUP BY WITH ROLLUP Fix</strong>: The GROUP BY WITH ROLLUP functionality has been made more reliable and robust, fixing issues that previously caused incorrect aggregation results or query failures. This ensures accurate hierarchical data analysis and reporting, particularly important for financial and business intelligence applications where rollup operations are critical for generating summary reports.</li>
+<li><strong>DuckDB Memory Management</strong>: Proper handling and utilization of memory when DuckDB is used has been implemented, preventing memory leaks and optimizing resource allocation. This improvement is crucial for large-scale data processing tasks, as it ensures stable performance during complex analytical queries and prevents system crashes due to memory exhaustion.</li>
+<li><strong>Static README Integration</strong>: README files for integrations are now pulled statically from GitHub instead of requiring local storage. This reduces the application footprint, ensures users always have access to the latest documentation, and simplifies the deployment process by eliminating the need to maintain local documentation files.</li>
+<li><strong>pgvector Default Knowledge Base</strong>: The default Knowledge Base store in Docker-compose has been switched to pgvector, providing enhanced performance for vector operations and similarity searches. This change significantly improves the speed and accuracy of semantic search capabilities, making it ideal for RAG applications and AI-powered search features.</li>
+<li><strong>Security Upgrades</strong>: Numerous security upgrades have been implemented across multiple packages including urllib3, starlette, keras, protobuf, numpy, and others. These updates address known vulnerabilities and ensure the system remains secure against emerging threats, protecting sensitive data and maintaining compliance with security standards.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-bash"># Update to v26.0.0 (Note: Contains breaking changes)
+# Backup your configuration before upgrading
+
+# Pull the latest image
+docker pull mindsdb/mindsdb:latest
+
+# Stop existing container
+docker stop mindsdb
+
+# Remove existing container
+docker rm mindsdb
+
+# Start new container with pgvector as default
+# Note: This uses the new default configuration
+docker run -d --name mindsdb \
+  -p 47334:47334 \
+  -p 47335:47335 \
+  -v mindsdb_storage:/storage \
+  mindsdb/mindsdb:latest
+
+# Verify the new version
+docker logs mindsdb | grep "MindsDB version"
+
+# Test pgvector integration
+# Create a new knowledge base using pgvector
+docker exec mindsdb mindsdb --api=http --config "knowledge_base_engine=pgvector"
+
+# Test the GROUP BY WITH ROLLUP fix
+# Connect to MindsDB and run a test query
+docker exec -it mindsdb psql -h localhost -p 47335 -U mindsdb
+# Then run: SELECT * FROM table GROUP BY WITH ROLLUP column1, column2;</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">mindsdb/mindsdb-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>agno - Agno v2.5.5 - Slack Interface, ModelsLab Image Generation, and Bug Fixes</title>
+    <link>https://github.com/agno-agi/agno</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces real-time streaming for Slack interfaces with live progress cards, adds image generation capabilities to ModelsLabTools, and includes several critical bug fixes for Gemini, AWS Bedrock, and workflow image handling.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Slack Interface Real-time Streaming</strong>: The Slack interface now supports real-time streaming with live progress cards for tool calls, reasoning, and workflow steps. This transforms the user experience from static responses to dynamic, interactive conversations where users can see the agent's thought process unfold in real-time. Each Slack instance can now use its own token and signing_secret, enabling multiple bots on the same server without conflicts.</li>
+<li><strong>ModelsLab Image Generation</strong>: ModelsLabTools now supports image generation via ModelsLab's text-to-image API, completing the full media suite. This allows agents to generate images directly from text descriptions, enabling use cases like creating visual content, generating charts, or producing illustrations as part of workflows. The integration provides PNG/JPG output formats and integrates seamlessly with existing ModelsLab media tools.</li>
+<li><strong>Gemini API Empty Message Fix</strong>: Fixed a critical bug where empty message parts were causing request failures when sending conversations to the Gemini API. Previously, agents would crash or fail when processing conversations with empty segments, disrupting workflows. This fix ensures robust conversation handling by filtering out empty parts before API calls, making Gemini integration more reliable for production use.</li>
+<li><strong>AWS Bedrock Tool Result Merging</strong>: Improved AWS Bedrock integration by merging consecutive toolResult blocks into single user messages. This enhancement creates more natural conversation flows by consolidating multiple tool outputs into cohesive responses, reducing message fragmentation and improving the overall user experience when using Bedrock models with tool calling capabilities.</li>
+<li><strong>Workflow Image Artifact Handling</strong>: Enhanced workflow step processing to handle raw image bytes in _convert_image_artifacts_to_images. This fix ensures workflows can properly process and convert image artifacts, preventing failures when dealing with binary image data. It's particularly important for workflows that generate or manipulate images as part of their execution pipeline.</li>
+<li><strong>Knowledge Filter Serialization</strong>: Fixed serialization of FilterExpr objects in GET /agents and /teams responses. This ensures that complex filter expressions are properly serialized and deserialized when retrieving agent and team configurations via the API, preventing configuration loss and enabling reliable programmatic management of agents and teams.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from agno import Agent, SlackInterface, ModelsLabTools
+
+# Slack Interface with Real-time Streaming
+agent = Agent(
+    tools=[ModelsLabTools()],
+    interfaces=[
+        SlackInterface(
+            token="xoxb-your-slack-token",
+            signing_secret="your-signing-secret",
+            enable_streaming=True  # Enables real-time progress cards
+        )
+    ]
+)
+
+# Image Generation Example
+async def generate_image():
+    result = await agent.run(
+        "Create an image of a futuristic city skyline at sunset",
+        tools=[ModelsLabTools()]
+    )
+    print(f"Generated image URL: {result.image_url}")
+
+# Usage
+if __name__ == "__main__":
+    generate_image()</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">agno-agi/agno-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>datasets - 4.6.0</title>
+    <link>https://github.com/huggingface/datasets</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release adds comprehensive support for multimodal data in Lance datasets, including native handling of Image, Video, and Audio types. It introduces Xet deduplication for faster uploads/downloads, adds resharding capabilities for IterableDatasets, and includes various bug fixes and improvements.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Multimodal Lance Dataset Support</strong>: Previously, Lance datasets required manual type inference for binary blobs. Now the library automatically detects and handles Image, Video, and Audio types, making it seamless to work with multimodal datasets. This eliminates the need for custom preprocessing pipelines when loading datasets like OpenVid-1M, significantly reducing setup complexity for computer vision and multimedia applications.</li>
+<li><strong>Video Type Support in push_to_hub</strong>: Before this update, pushing video datasets to the Hub required manual conversion and handling. Now you can directly push Video-typed datasets using push_to_hub(), with automatic type casting and proper handling of video blobs. This streamlines the workflow for sharing video datasets and ensures type consistency across the Hub ecosystem.</li>
+<li><strong>Xet Deduplication for Faster Transfers</strong>: Previously, converting between Lance and Parquet formats required re-uploading all binary assets, leading to slow transfers and wasted bandwidth. With Xet deduplication, the system reuses binary chunks across formats, making cross-format conversions nearly instantaneous. This is particularly valuable for large multimedia datasets where video and image assets dominate storage requirements.</li>
+<li><strong>IterableDataset Resharding</strong>: Large streaming datasets were previously limited by fixed shard counts, which could impact parallelism and performance. The new reshard() method allows dynamic splitting of shards, particularly effective for Parquet files where each row group becomes a shard. This enables better resource utilization in distributed processing and more granular control over data loading patterns.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from datasets import load_dataset
+
+# Load a video dataset with automatic type inference
+ds = load_dataset("lance-format/Openvid-1M", streaming=True, split="train")
+print(ds.features)  # Shows Video() type for video_blob
+
+# Push a video dataset to the Hub
+from datasets import Dataset, Video
+video_ds = Dataset.from_dict({"video": ["path/to/video.mp4"]})
+video_ds = video_ds.cast_column("video", Video())
+video_ds.push_to_hub("username/my-video-dataset")
+
+# Reshard a streaming dataset for better parallelism
+parquet_ds = load_dataset("fancyzhx/amazon_polarity", split="train", streaming=True)
+resharded_ds = parquet_ds.reshard()
+print(f"Original shards: {parquet_ds.num_shards}, Resharded: {resharded_ds.num_shards}")</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">huggingface/datasets-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>ComfyUI - v0.15.0</title>
+    <link>https://github.com/Comfy-Org/ComfyUI</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces significant enhancements including basic text generation support with native models (initially supporting Gemma3), new audio processing capabilities with a 3-band equalizer node, improved API node functionality with ElevenLabs integration, and various performance optimizations and bug fixes.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Basic Text Generation Support</strong>: Adds native text generation capabilities to ComfyUI, initially supporting Gemma3 models. This eliminates the need for external text generation tools and allows users to integrate text generation directly into their AI workflows. Previously, users had to rely on separate text generation services or models, creating workflow fragmentation. Now, text generation can be seamlessly combined with image generation and other AI tasks within the same interface.</li>
+<li><strong>3-Band Equalizer Node for Audio</strong>: Introduces a new audio processing node that provides basic equalization capabilities with three frequency bands. This enhancement is particularly valuable for users working with audio-visual content or video generation workflows. Before this update, users had limited audio processing options within ComfyUI, requiring external audio editing tools. Now, basic audio adjustments can be performed directly within the ComfyUI environment, streamlining the creative process.</li>
+<li><strong>ElevenLabs API Node Integration</strong>: Adds support for ElevenLabs text-to-speech and voice generation services through new API nodes. This integration expands ComfyUI's capabilities into the audio domain, allowing users to generate realistic voiceovers and speech directly within their workflows. Previously, users needed to use separate services for voice generation and then manually integrate the results. This update creates a more cohesive environment for multimedia content creation.</li>
+<li><strong>Performance Optimizations for FP8 Workflows</strong>: Implements optimizations that limit the return of requants, specifically improving performance for FP8 dynamic_vram workflows. This addresses a critical performance bottleneck that affected users working with low-precision models and memory-constrained environments. The optimization reduces computational overhead and memory usage, making FP8 workflows more practical for real-world applications where resource efficiency is crucial.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python"># Example: Using the new text generation with Gemma3
+from pathlib import Path
+
+# Load a Gemma3 model for text generation
+model_path = Path("path/to/gemma3/model")
+
+# Create a text generation workflow
+# Note: This is a conceptual example as the actual implementation may vary
+# based on ComfyUI's specific API structure
+
+# Example workflow setup (pseudo-code)
+workflow = {
+    "nodes": [
+        {
+            "type": "TextEncode",
+            "inputs": {"text": "Generate a creative story about AI"}
+        },
+        {
+            "type": "Gemma3Generate",
+            "inputs": {"prompt": "Generate a creative story about AI"}
+        }
+    ]
+}
+
+# Execute the workflow
+# result = comfyui.execute(workflow)
+# print(result)</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">Comfy-Org/ComfyUI-2026-02-24</guid>
+    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>docling - v2.75.0</title>
+    <link>https://github.com/docling-project/docling</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release introduces a backend parser for XBRL instance reports, unifies model-family inference engines with KServe v2 API support, and includes several bug fixes for document processing and ASR handling.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>XBRL Instance Reports Parser</strong>: Adds native support for parsing XBRL (eXtensible Business Reporting Language) instance reports, enabling financial and regulatory document processing directly within Docling. This eliminates the need for external XBRL parsers and provides seamless integration with other document types.</li>
+<li><strong>Unified Model-Family Inference Engines</strong>: Introduces a unified inference engine architecture that supports multiple model families including image classification, with KServe v2 API compatibility. This standardization simplifies deployment and management of AI models across different use cases, reducing configuration complexity and improving interoperability.</li>
+<li><strong>ASR Segment Length Validation</strong>: Fixes a bug where ASR (Automatic Speech Recognition) segments with zero length could cause processing errors. This ensures robust handling of audio transcripts and prevents crashes when processing incomplete or malformed speech data.</li>
+<li><strong>DOCX Hyperlink Safety</strong>: Adds protection against None hyperlink addresses in DOCX documents, preventing crashes when processing documents with broken or missing hyperlink references. This improves stability when handling real-world documents with inconsistent formatting.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from docling import Document
+
+# Parse XBRL instance report
+xbrl_doc = Document.parse("financial_report.xbrl")
+print(f"Parsed {len(xbrl_doc.pages)} pages from XBRL report")
+
+# Use unified inference engine with KServe v2 API
+from docling.inference import UnifiedInferenceEngine
+engine = UnifiedInferenceEngine(model_family="image-classification")
+result = engine.predict(image_path="sample.jpg")
+print(f"Classification result: {result}")
+
+# Process DOCX with improved hyperlink handling
+docx_doc = Document.parse("document.docx")
+for paragraph in docx_doc.get_paragraphs():
+    if paragraph.hyperlink:
+        print(f"Link: {paragraph.hyperlink.text}")</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">docling-project/docling-2026-02-24</guid>
+    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>langgraph - langgraph-sdk 0.3.9</title>
+    <link>https://github.com/langchain-ai/langgraph</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<p>This release adds a new extract parameter to threads.search() for more granular data retrieval and includes a new make type target for type checking.</p>
+<h3>💡 Why It Matters</h3>
+<ul>
+<li><strong>Extract Parameter for threads.search()</strong>: Previously, the threads.search() method returned all thread data fields, which could be inefficient when only specific information was needed. The new extract parameter allows developers to specify exactly which fields to retrieve, reducing payload size and improving performance. This is particularly useful for applications that only need thread IDs or specific metadata without the full thread content, enabling more efficient data processing and reduced bandwidth usage.</li>
+<li><strong>Type Checking Target</strong>: The addition of a make type target provides developers with a standardized way to perform type checking across the SDK. This ensures better code quality and helps catch type-related errors early in the development process. Before this update, developers had to manually configure type checking tools, but now they can use the standardized make type command for consistent type validation across different environments.</li>
+</ul>
+<h3>🛠️ Try It Out</h3>
+<pre><code class="language-python">from langgraph_sdk import get_client
+
+# Initialize client
+client = get_client()
+
+# Search threads with specific field extraction
+# Previously returned all fields, now you can specify what you need
+threads = await client.threads.search(extract=['thread_id', 'state'])
+
+# Type checking
+# Run the new type checking target
+# In terminal: make type
+# This will validate all type annotations in the SDK</code></pre>
+    ]]></description>
+    <guid isPermaLink="false">langchain-ai/langgraph-2026-02-24</guid>
+    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+</channel>
+</rss>

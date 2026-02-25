@@ -1,0 +1,367 @@
+:root {
+    --primary: #2c3e50;
+    --accent: #3498db;
+    --bg: #f4f7f6;
+    --card-bg: #ffffff;
+    --text: #333;
+    --meta: #7f8c8d;
+    --border: #e0e0e0;
+    --code-bg: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+    --primary: #ecf0f1;
+    --accent: #e74c3c;
+    --bg: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text: #e0e0e0;
+    --meta: #95a5a6;
+    --border: #404040;
+    --code-bg: rgba(255,255,255,0.1);
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header {
+    background: var(--card-bg);
+    padding: 1.5rem 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--primary);
+}
+
+.subtitle {
+    margin: 0.2rem 0 0;
+    color: var(--meta);
+    font-size: 0.9rem;
+}
+
+.highlight {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+main {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.repo-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    /* Ensure container doesn't constrain content too much */
+    min-width: 0;
+}
+
+.repo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+}
+
+.repo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.repo-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.3;
+}
+
+.repo-header a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.repo-header a:hover {
+    color: var(--accent);
+}
+
+.repo-meta {
+    font-size: 0.85rem;
+    color: var(--meta);
+    white-space: nowrap;
+    margin-left: 1rem;
+}
+
+.stars {
+    color: #f1c40f;
+    font-weight: 600;
+}
+
+.repo-description {
+    font-size: 0.9rem;
+    color: var(--meta);
+    margin-bottom: 1rem;
+    font-style: italic;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ... existing styles ... */
+
+.changelog-summary {
+    font-size: 0.95rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    flex-grow: 1;
+}
+
+/* Accordion Styles */
+.accordion-section {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+}
+
+.accordion-section:last-child {
+    border-bottom: none;
+}
+
+.accordion-header {
+    cursor: pointer;
+    padding: 0.8rem 0;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    margin: 0; /* Reset default h3 margin */
+}
+
+.accordion-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.accordion-header::after {
+    content: '+';
+    font-size: 1.5rem;
+    color: var(--meta);
+    transition: transform 0.3s ease;
+    margin-left: 1rem;
+}
+
+.accordion-header[aria-expanded="true"]::after {
+    transform: rotate(45deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease;
+    opacity: 0;
+}
+
+.accordion-content.expanded {
+    opacity: 1;
+    padding-bottom: 1rem;
+    /* Max-height will be set by JS, but give it a safe fallback/initial transition target if needed, 
+       though JS scrollHeight is better */
+}
+
+/* Code block fixes */
+.changelog-summary pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+    /* Wrap text to prevent overflow as requested */
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+    max-width: 100%;
+    position: relative; /* For copy button positioning */
+}
+
+.changelog-summary code {
+    background: transparent; /* inherited from pre if inside */
+    padding: 0;
+    border-radius: 0;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    color: var(--accent);
+    /* Ensure inline code also behaves well */
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Copy Button Styles */
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s ease;
+    opacity: 0; /* Hidden by default */
+}
+
+[data-theme="dark"] .copy-btn {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: var(--text);
+}
+
+.changelog-summary pre:hover .copy-btn {
+    opacity: 1; /* Show on hover */
+}
+
+.copy-btn:hover {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.copy-btn.copied {
+    background-color: #27ae60;
+    color: white;
+    border-color: #27ae60;
+}
+
+/* Adjust lists inside summary */
+.changelog-summary ul {
+    padding-left: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.changelog-summary li {
+    margin-bottom: 0.5rem;
+}
+
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--meta);
+}
+
+.empty-state p {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.sub-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--meta);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+    background: var(--card-bg);
+}
+
+@media (max-width: 600px) {
+    h1 { font-size: 1.5rem; }
+    .repo-card { padding: 1rem; }
+    .copy-btn { opacity: 1; } /* Always show on mobile since no hover */
+}
+
+/* Global Summary Card */
+.global-summary-card {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(52, 152, 219, 0.05) 100%);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+}
+
+.global-summary-card h2 {
+    margin-top: 0;
+    color: var(--accent);
+    font-size: 1.8rem;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.global-summary-card h3 {
+    margin-top: 1.5rem;
+    color: var(--primary);
+    font-size: 1.3rem;
+}
+
+.ecosystem-overview {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text);
+}
+
+[data-theme="dark"] .global-summary-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(52, 152, 219, 0.1) 100%);
+}
