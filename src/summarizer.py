@@ -31,11 +31,11 @@ def check_for_daily_update(content: str, target_date: str) -> dict:
     # Find the date index
     idx = content.find(target_date)
     
-    # Start context 500 chars before (to catch the header like "## v1.2.3 (2026-02-25)")
-    start_idx = max(0, idx - 500)
+    # Start context 1000 chars before (to catch the header like "## v1.2.3 (2026-02-25)")
+    start_idx = max(0, idx - 1000)
     
-    # End context: Take next 2000 chars (enough for a summary)
-    end_idx = min(len(content), idx + 2000)
+    # End context: Take next 4000 chars (Increased from 2000 to capture full release notes for better "Try It Out")
+    end_idx = min(len(content), idx + 4000)
     
     truncated_content = content[start_idx:end_idx]
     
@@ -56,9 +56,9 @@ def check_for_daily_update(content: str, target_date: str) -> dict:
                 "content": prompt
             }
         ],
-        "temperature": 0.1, # Very low temp for strict parsing
+        "temperature": 0.2, # Slightly increased to allow for better code generation creativity while keeping strict JSON
         "response_format": {"type": "json_object"},
-        "max_tokens": 1000
+        "max_tokens": 2000 # Increased from 1000 to allow for longer code snippets
     }
     
     try:
@@ -66,7 +66,7 @@ def check_for_daily_update(content: str, target_date: str) -> dict:
             config.OPENROUTER_BASE_URL + "/chat/completions",
             headers=headers,
             json=payload,
-            timeout=30
+            timeout=45 # Increased timeout for longer generation
         )
         response.raise_for_status()
         
