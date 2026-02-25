@@ -35,9 +35,9 @@ A real-time, autonomous dashboard that aggregates and summarizes daily updates f
 3.  **Configure Secrets**:
     Create a `.env` file:
     ```env
-    OPENROUTER_API_KEY=sk-or-v1-your-key-here
-    GITHUB_TOKEN=ghp_your_github_token  # REQUIRED for rate limits
-    ```
+38→    OPENROUTER_API_KEY=sk-or-v1-your-key-here
+39→    GH_ACCESS_TOKEN=ghp_your_github_token  # REQUIRED for rate limits
+40→    ```
 
 ## 🏃‍♂️ Usage
 
@@ -56,7 +56,7 @@ uv run src/main.py --date 2024-02-25
 ### 1. Environment Variables
 Ensure these secrets are set in your GitHub Repository (Settings > Secrets and variables > Actions):
 -   `OPENROUTER_API_KEY`: API key for the LLM provider.
--   `GITHUB_TOKEN`: Personal Access Token (Classic) with `public_repo` scope.
+-59→-   `GH_ACCESS_TOKEN`: Personal Access Token (Classic) with `public_repo` scope.
 
 ### 2. CI/CD Pipeline
 The project uses GitHub Actions (`.github/workflows/daily-update.yml`) for continuous delivery.

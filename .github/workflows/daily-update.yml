@@ -31,7 +31,7 @@ jobs:
       - name: Generate Daily Summary
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           # If manual input provided, use it
           if [ "${{ inputs.target_date }}" != "" ]; then

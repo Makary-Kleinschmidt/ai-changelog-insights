@@ -13,11 +13,11 @@ except ImportError:
     import config
 
 def get_github_client():
-    token = os.getenv("GITHUB_TOKEN")
+    token = os.getenv("GH_ACCESS_TOKEN")
     if token:
         auth = Auth.Token(token)
         return Github(auth=auth)
-    print("Warning: No GITHUB_TOKEN found. Using unauthenticated requests (Rate limit: 60/hr).")
+    print("Warning: No GH_ACCESS_TOKEN found. Using unauthenticated requests (Rate limit: 60/hr).")
     return Github()
 
 @retry(

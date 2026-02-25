@@ -6,7 +6,7 @@ load_dotenv()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 REWRITE_MODEL = "arcee-ai/trinity-large-preview:free"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
 
 # VIP Repositories to always check
 VIP_REPOS = [
