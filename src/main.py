@@ -20,7 +20,7 @@ def generate_site(target_date_str: str = None):
     print(f"🚀 Starting Real-Time AI Changelog Aggregation for {target_date_str}...")
     
     processed_repos = []
-    MAX_REPOS = 10
+    MAX_REPOS = 9
     CHECK_LIMIT = 200 # Increased limit
     
     # Dates to check: Target Date, then previous days if needed
@@ -91,7 +91,7 @@ def generate_site(target_date_str: str = None):
 
         # Check termination condition
         if len(primary_list) >= MAX_REPOS:
-            print("🎉 Secured 10 fresh updates!")
+            print(f"🎉 Secured {MAX_REPOS} fresh updates!")
             break
             
         if checked_count >= CHECK_LIMIT:

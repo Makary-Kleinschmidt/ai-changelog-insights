@@ -29,16 +29,24 @@ Input CHANGELOG:
 {content}
 
 Instructions:
-1.  **Identify Updates**: Find the entry for {target_date}. If none, output "NO_UPDATE".
+1.  **Identify Updates**: Check if there is an entry strictly matching {target_date}.
+    -   If YES: Summarize it.
+    -   If NO: Output ONLY "NO_UPDATE" (do not explain, do not summarize older entries).
 2.  **Analyze Impact**: For each major change (Feature, Fix, Breaking), explain:
     -   **What it means**: Translate technical jargon into plain English.
     -   **Why it matters**: How does this improve the developer experience or application performance?
-    -   **Actionable Step**: Provide a concrete thing for the user to try (e.g., "Update your dependency to vX.Y.Z to fix the memory leak" or "Try the new `Client.chat()` method for cleaner code").
+    -   **Actionable Step**: Provide a concrete thing for the user to try.
+
+**IMPORTANT**: 
+- Do NOT state "No update found for {target_date}" in your summary. 
+- Do NOT mention "The latest entry is..." or "This release is from...".
+- Just present the content of the update as if it is fresh news.
+- Start directly with the "What's New" content.
 
 Output Format (Markdown):
 
 ### 🚀 What's New
-[Concise summary of the update]
+[Concise summary of the update content]
 
 ### 💡 Why It Matters
 - **[Feature/Fix Name]**: [Explanation of impact]
