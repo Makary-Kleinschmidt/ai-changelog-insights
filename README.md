@@ -8,10 +8,14 @@ https://makary-kleinschmidt.github.io/ai-changelog-insights/
 
 -   **Real-Time Aggregation**: Fetches fresh data directly from GitHub API, bypassing caches.
 -   **Smart Filtering**: Identifies high-impact AI repositories with updates strictly from the **current day**.
--   **Intelligent Fallback**: Scans up to 100 active repositories to ensure 10 distinct daily updates are found.
--   **Concise Summaries**: Uses OpenRouter LLM to extract key features, fixes, and breaking changes.
--   **Responsive Design**: Dark/Light mode supported, < 2s load time.
+-   **Intelligent Fallback**: Scans up to 200 active repositories to secure 9 daily updates.
+-   **Concise Summaries**: Uses Gemini 3 Flash Preview to extract key features, fixes, and breaking changes.
+-   **Resilient Architecture**: Automated retries on 503/429/504 errors with tiered model fallback (Gemini 3 → 2.5 → 2.0). Truncated JSON repair for cut-off responses.
+-   **Intelligent Insights**: Provides a 3-level "Try It Out" section (Beginner, Intermediate, Advanced).
+-   **Responsive Design**: Dark/Light mode supported, includes collapsed accordion sections for clean layout.
 -   **Automated Pipeline**: Runs daily at 23:55 UTC via GitHub Actions.
+
+See [CHANGELOG.md](./CHANGELOG.md) for recent updates.
 
 ## 🛠️ Setup & Installation
 
@@ -37,28 +41,32 @@ https://makary-kleinschmidt.github.io/ai-changelog-insights/
 3.  **Configure Secrets**:
     Create a `.env` file:
     ```env
-38→    OPENROUTER_API_KEY=sk-or-v1-your-key-here
-39→    GH_ACCESS_TOKEN=ghp_your_github_token  # REQUIRED for rate limits
-40→    ```
+    GEMINI_API_KEY=your_google_ai_studio_key_here
+    GH_ACCESS_TOKEN=ghp_your_github_token  # REQUIRED for rate limits
+    ```
 
 ## 🏃‍♂️ Usage
 
 ### Manual Run (Today's Updates)
 ```bash
-uv run src/main.py
+uv run python -m src.main
 ```
 
 ### Run for Specific Date
 ```bash
-uv run src/main.py --date 2024-02-25
+uv run python -m src.main --date 2026-02-26
+```
+
+### Force Regeneration
+```bash
+uv run python -m src.main --date 2026-02-26 --force
 ```
 
 ## 📦 Deployment Plan
 
 ### 1. Environment Variables
-Ensure these secrets are set in your GitHub Repository (Settings > Secrets and variables > Actions):
--   `OPENROUTER_API_KEY`: API key for the LLM provider.
--59→-   `GH_ACCESS_TOKEN`: Personal Access Token (Classic) with `public_repo` scope.
+-   `GEMINI_API_KEY`: API key for Google AI Studio.
+-   `GH_ACCESS_TOKEN`: Personal Access Token (Classic) with `public_repo` scope.
 
 ### 2. CI/CD Pipeline
 The project uses GitHub Actions (`.github/workflows/daily-update.yml`) for continuous delivery.
@@ -66,7 +74,7 @@ The project uses GitHub Actions (`.github/workflows/daily-update.yml`) for conti
 -   **Process**:
     1.  Checkout code.
     2.  Install `uv` and dependencies.
-    3.  Run `src/main.py` to fetch fresh data and generate `site/index.html`.
+    3.  Run `python -m src.main` to fetch fresh data and generate `site/index.html`.
     4.  Deploy `site/` directory to `gh-pages` branch.
 
 ### 3. Monitoring & Alerts
@@ -80,7 +88,7 @@ The project uses GitHub Actions (`.github/workflows/daily-update.yml`) for conti
 ### 4. Automated Verification
 Run the verification script to ensure the logic works as expected without API calls (mocked):
 ```bash
-uv run tests/test_flow.py
+uv run python -m pytest tests/test_flow.py
 ```
 
 ## 🛡️ Architecture
@@ -90,11 +98,13 @@ uv run tests/test_flow.py
     -   Filters repositories by `pushed_at` timestamp.
     -   Iterates through paginated results until quota is met.
 -   **Summarizer (`src/summarizer.py`)**:
-    -   Uses LLM to strictly parse CHANGELOGs for specific dates.
-    -   Returns `NO_UPDATE` if no entry matches.
+    -   Uses Gemini 3 Flash Preview (with 2.5/2.0 fallback) to parse CHANGELOGs.
+    -   Implements 5 RPM rate limiting (12s delay) and retries on 503/429/504.
+    -   Returns structured JSON for What's New, Why It's Important, and Try It Out (3 levels).
+    -   Includes truncated JSON repair for cut-off LLM responses.
 -   **Generator (`src/main.py`)**:
     -   Orchestrates the loop.
     -   Generates static HTML with Jinja2.
 
 ---
-*Powered by OpenRouter and GitHub API.*
+*Powered by Gemini 3 Flash Preview and GitHub API.*

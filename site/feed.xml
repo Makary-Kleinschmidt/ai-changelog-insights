@@ -6,256 +6,698 @@
   <description>Daily AI updates, summarized for developers.</description>
   <atom:link href="https://ai-changelog-insights.github.io/feed.xml" rel="self" type="application/rss+xml" />
   <language>en-us</language>
-  <lastBuildDate>Wed, 25 Feb 2026 18:56:36 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 26 Feb 2026 15:44:24 GMT</lastBuildDate>
+  
+  <item>
+    <title>llama.cpp - Release b8157</title>
+    <link>https://github.com/ggml-org/llama.cpp</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<ul>
+<li>Added support for permuted tensor operations.</li>
+<li>Removed redundant s0/s10 checks, potentially streamlining tensor processing.</li>
+<li>Implemented a memory overlap check in the Vulkan backend before performing fusion operations.</li>
+</ul>
+<h3>💡 Why It's Important</h3>
+<p>These updates bring significant improvements to the underlying tensor computation engine, particularly for users leveraging the Vulkan backend. The addition of support for permuted operations and the removal of unnecessary s0/s10 checks are crucial for optimizing how tensors are handled internally. This can lead to more efficient memory access patterns and faster execution times for various model architectures, especially those that heavily rely on tensor permutations for performance. For users running <code>llama.cpp</code> on Vulkan-enabled hardware, the new memory overlap check before fusion operations is a critical stability enhancement. Previously, memory overlaps could lead to unpredictable behavior or incorrect results when the Vulkan backend attempted to fuse multiple operations for performance. This check ensures data integrity and prevents potential crashes, making the Vulkan inference more robust and reliable for production deployments.</p>
+<h3>🛠️ Try It Out</h3>
+<details class='try-it-level'>
+<summary>🟢 Basic Model Inference</summary>
+<pre><code class="language-python">from llama_cpp import Llama
+
+# Initialize Llama with a small model (e.g., TinyLlama)
+llm = Llama(model_path="./tinyllama-1.1B-1T-token-v1.00.gguf", n_ctx=512)
+
+# Generate a simple completion
+output = llm("Q: Name the capital of France. A:", max_tokens=32, stop=["Q:", "\n"], echo=True)
+print(output["choices"][0]["text"])</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Inference with GPU Layers (Vulkan benefits)</summary>
+<pre><code class="language-python">from llama_cpp import Llama
+
+# For Vulkan backend, ensure llama.cpp is built with GGML_VULKAN=1
+# and n_gpu_layers is set to offload layers to the GPU.
+# The internal optimizations will automatically apply.
+llm = Llama(
+    model_path="./llama-2-7b-chat.gguf",
+    n_ctx=2048,  # Context window
+    n_gpu_layers=999, # Offload all layers to GPU if available
+    verbose=False
+)
+
+# Perform a more complex generation
+prompt = "Write a short story about a robot who discovers art."
+output = llm(
+    prompt,
+    max_tokens=128,
+    temperature=0.7,
+    top_p=0.9,
+    repeat_penalty=1.1
+)
+print(output["choices"][0]["text"])</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Streaming Inference with Error Handling</summary>
+<pre><code class="language-python">import logging
+from llama_cpp import Llama
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def stream_response(llm_instance, prompt, max_tokens=64):
+    try:
+        stream = llm_instance(
+            prompt,
+            max_tokens=max_tokens,
+            stream=True,
+            stop=["\n\n"],
+            echo=False
+        )
+        full_response = ""
+        for chunk in stream:
+            token = chunk["choices"][0]["text"]
+            full_response += token
+            print(token, end='', flush=True)
+        print("\n") # Newline after streaming
+        return full_response
+    except Exception as e:
+        logging.error(f"An error occurred during streaming: {e}")
+        return None
+
+# Ensure your model path is correct and llama.cpp is built with desired backends (e.g., Vulkan)
+llm = Llama(
+    model_path="./mistral-7b-instruct-v0.2.gguf",
+    n_ctx=4096,
+    n_gpu_layers=30, # Adjust based on your GPU memory and model size
+    verbose=False
+)
+
+logging.info("Llama model loaded successfully.")
+
+user_prompt = "Explain the concept of quantum entanglement in simple terms."
+response = stream_response(llm, user_prompt)
+
+if response:
+    logging.info(f"Full response generated: {response[:100]}...")
+else:
+    logging.warning("Failed to generate a response.")</code></pre>
+</details>
+    ]]></description>
+    <guid isPermaLink="false">ggml-org/llama.cpp-2026-02-26</guid>
+    <pubDate>Thu, 26 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>chroma - Chroma 1.5.1.dev71</title>
+    <link>https://github.com/chroma-core/chroma</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<ul>
+<li>Implemented Quantized Spann Segment Writer and Reader for more efficient vector storage and retrieval.</li>
+<li>Removed 'beta' label from the Advanced Search API, marking it as production-ready.</li>
+<li>Added delete_collection support for Multi-Cluster Multi-Region (MCMR) architectures.</li>
+<li>Improved system stability by removing unwraps in the indexing logic to prevent potential Rust panics.</li>
+<li>Enhanced observability with new tracing spans for Row Level Security (RLS) and blockfile operations.</li>
+<li>Added garbage collection for usearch index files to reclaim disk space automatically.</li>
+<li>Updated documentation for Where Filters, Metadata arrays, and Python/TypeScript references.</li>
+<li>Optimized indexing performance by using cluster averages as centers.</li>
+</ul>
+<h3>💡 Why It's Important</h3>
+<p>This update represents a significant step toward enterprise-grade stability and scalability for Chroma. The introduction of Quantized Spann Segment components allows for much higher density and faster retrieval in vector search, which is critical for large-scale RAG applications. By removing the beta label from the Advanced Search API and hardening the Rust core through the removal of unsafe unwraps, the platform provides a more reliable foundation for production workloads. Furthermore, the addition of MCMR-aware features like collection deletion and enhanced tracing ensures that developers managing distributed, multi-region deployments have the necessary tools for maintenance and performance tuning, moving beyond simple single-node setups to robust, observable infrastructure.</p>
+<h3>🛠️ Try It Out</h3>
+<details class='try-it-level'>
+<summary>🟢 Stable Advanced Search</summary>
+<pre><code class="language-python">import chromadb
+
+client = chromadb.Client()
+collection = client.get_or_create_collection("my_docs")
+
+collection.add(
+    ids=["id1"],
+    documents=["Chroma is a vector database"]
+)
+
+# The Advanced Search API is now stable and out of beta
+results = collection.query(
+    query_texts=["What is Chroma?"],
+    n_results=1
+)
+print(results)</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Metadata Array Filtering</summary>
+<pre><code class="language-python">import chromadb
+
+client = chromadb.HttpClient(host="localhost", port=8000)
+collection = client.get_or_create_collection("inventory")
+
+# Using the updated metadata array support
+collection.add(
+    ids=["item_001"],
+    metadatas=[{"categories": ["electronics", "mobile"]}],
+    documents=["Latest flagship smartphone"]
+)
+
+# Querying using the new Where Filter reference patterns
+results = collection.query(
+    query_texts=["phone"],
+    where={"categories": {"$in": ["electronics"]}}
+)
+print(results)</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Production MCMR Management</summary>
+<pre><code class="language-python">import chromadb
+from chromadb.config import Settings
+import logging
+
+# Configure client for a distributed environment
+client = chromadb.HttpClient(
+    settings=Settings(
+        chroma_api_impl="rest",
+        chroma_server_host="chroma-mcmr-gateway"
+    )
+)
+
+def safe_cleanup(collection_name):
+    try:
+        # Utilizing the new MCMR-aware delete_collection
+        client.delete_collection(name=collection_name)
+        print(f"Successfully purged {collection_name}")
+    except Exception as e:
+        # Handle specific MCMR errors, such as forbidden fork_collection
+        logging.error(f"Failed to manage collection in multi-region: {e}")
+
+safe_cleanup("temp_processing_shard")</code></pre>
+</details>
+    ]]></description>
+    <guid isPermaLink="false">chroma-core/chroma-2026-02-26</guid>
+    <pubDate>Thu, 26 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
   
   <item>
     <title>langchain - langchain-core==1.2.16</title>
     <link>https://github.com/langchain-ai/langchain</link>
     <description><![CDATA[
       <h3>🚀 What's New</h3>
-<p>This release includes two key fixes: improved handling of empty tool chunk IDs during merge operations and a version bump to 1.2.16.</p>
-<h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Fix empty tool chunk ID handling</strong>: Previously, empty tool chunk IDs were not properly handled during merge operations, which could lead to unexpected behavior or errors. This fix ensures that empty tool chunk IDs are treated as missing values, preventing potential crashes and ensuring more robust tool call processing in agent workflows.</li>
+<li>Released version 1.2.16 of `langchain-core`.</li>
+<li>Fixed an issue where empty tool chunk IDs were not correctly treated as missing during the merging process.</li>
 </ul>
+<h3>💡 Why It's Important</h3>
+<p>This update for <code>langchain-core</code> addresses a critical refinement in how tool call outputs are processed, specifically concerning the identification of tool chunk IDs during merging. In complex agentic workflows, tools often return results in chunks that need to be reassembled or merged based on their unique identifiers. Previously, an empty string provided as a tool chunk ID might have been interpreted as a valid, albeit empty, identifier. This could lead to ambiguity or incorrect merging behavior, potentially causing parts of tool outputs to be misaligned or lost, or even leading to runtime errors in downstream processing. By explicitly treating empty tool chunk IDs as "missing," <code>langchain-core</code> now ensures that only properly identified and non-empty chunks contribute to the merged output. This enhances the robustness and reliability of tool execution and result aggregation, preventing subtle data integrity issues and improving the overall stability of applications built with LangChain.</p>
 <h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from langchain_core.tools import merge_tool_calls
+<details class='try-it-level'>
+<summary>🟢 Basic Tool Invocation</summary>
+<pre><code class="language-python">from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI # Requires `pip install langchain-openai`
 
-# Example showing improved handling of empty chunk IDs
-tool_calls = [
-    {'name': 'tool1', 'arguments': '{}', 'id': '123'},
-    {'name': 'tool2', 'arguments': '{}', 'id': ''}  # Previously problematic empty ID
-]
+@tool
+def get_current_weather(location: str) -> str:
+    """Get the current weather in a given location."""
+    if location == "London":
+        return "70 degrees Fahrenheit and sunny."
+    return "Weather data not available for this location."
 
-# The merge operation now handles empty IDs gracefully
-merged = merge_tool_calls(tool_calls)
-print(merged)</code></pre>
+# Define the LLM and bind tools
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+llm_with_tools = llm.bind_tools([get_current_weather])
+
+# Invoke the LLM with a tool call request
+response = llm_with_tools.invoke([HumanMessage(content="What's the weather in London?")])
+print(response.tool_calls)
+# Expected output will show a tool_call object for get_current_weather</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Agent with Tool Execution and Output Handling</summary>
+<pre><code class="language-python">from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
+from langchain_openai import ChatOpenAI # Requires `pip install langchain-openai`
+
+@tool
+def get_stock_price(ticker: str) -> float:
+    """Get the current stock price for a given ticker symbol."""
+    stock_prices = {"AAPL": 170.50, "GOOG": 150.25, "MSFT": 400.10}
+    return stock_prices.get(ticker, 0.0)
+
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+tools = [get_stock_price]
+llm_with_tools = llm.bind_tools(tools)
+
+# Simulate an agent's thought process: LLM generates tool call, then execute it
+messages = [HumanMessage(content="What is the stock price of GOOG?")]
+ai_message = llm_with_tools.invoke(messages)
+
+if ai_message.tool_calls:
+    first_tool_call = ai_message.tool_calls[0]
+    print(f"AI requested tool: {first_tool_call.name} with args {first_tool_call.args}")
+    
+    # Execute the tool using its definition
+    tool_output = get_stock_price.invoke(first_tool_call.args)
+    print(f"Tool output: {tool_output}")
+    
+    # Send tool output back to LLM (this is where internal merging relies on tool_call_id)
+    messages.append(ai_message)
+    messages.append(ToolMessage(content=str(tool_output), tool_call_id=first_tool_call.id))
+    
+    final_response = llm_with_tools.invoke(messages)
+    print(f"Final response: {final_response.content}")
+else:
+    print(f"AI response: {ai_message.content}")</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Streaming Agent with Multiple Tool Calls</summary>
+<pre><code class="language-python">import asyncio
+from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
+from langchain_openai import ChatOpenAI # Requires `pip install langchain-openai`
+from typing import List, Dict, Union
+
+@tool
+def get_current_time(timezone: str = "UTC") -> str:
+    """Get the current time in a specified timezone."""
+    import datetime
+    import pytz # Requires `pip install pytz`
+    try:
+        tz = pytz.timezone(timezone)
+        now = datetime.datetime.now(tz)
+        return now.strftime("%Y-%m-%d %H:%M:%S %Z%z")
+    except Exception:
+        return f"Could not get time for timezone: {timezone}. Please provide a valid timezone like 'America/New_York'."
+
+@tool
+def get_random_number(min_val: int = 1, max_val: int = 100) -> int:
+    """Generate a random number within a specified range."""
+    import random
+    return random.randint(min_val, max_val)
+
+llm = ChatOpenAI(model="gpt-4o", temperature=0, streaming=True)
+tools = [get_current_time, get_random_number]
+llm_with_tools = llm.bind_tools(tools)
+
+async def run_agent_stream(user_message: str):
+    messages = [HumanMessage(content=user_message)]
+    
+    async for chunk in llm_with_tools.astream(messages):
+        if isinstance(chunk, AIMessage):
+            if chunk.content:
+                print(f"LLM: {chunk.content}", end="", flush=True)
+            if chunk.tool_calls:
+                print("\n--- Tool Calls Detected ---")
+                for tool_call in chunk.tool_calls:
+                    print(f"  Tool: {tool_call.name}, Args: {tool_call.args}, ID: {tool_call.id}")
+                    
+                    # Execute tool (simulating an agent's action)
+                    selected_tool = next(t for t in tools if t.name == tool_call.name)
+                    tool_output = selected_tool.invoke(tool_call.args)
+                    print(f"  Tool Output: {tool_output}")
+                    
+                    # Append tool output to messages for next turn
+                    messages.append(chunk) # Append the AI message with tool calls
+                    messages.append(ToolMessage(content=str(tool_output), tool_call_id=tool_call.id))
+                    
+                    # Continue streaming with the new messages
+                    print("\n--- Continuing with Tool Output ---")
+                    async for follow_up_chunk in llm_with_tools.astream(messages):
+                        if isinstance(follow_up_chunk, AIMessage) and follow_up_chunk.content:
+                            print(f"LLM: {follow_up_chunk.content}", end="", flush=True)
+                    print("\n--- End of Follow-up ---")
+                break # Stop after processing first set of tool calls for simplicity
+    print("\n--- Agent Finished ---")
+
+async def main():
+    print("Running example 1:")
+    await run_agent_stream("What is the current time in America/Los_Angeles?")
+    print("\n" + "="*50 + "\n")
+    print("Running example 2:")
+    await run_agent_stream("Generate a random number between 50 and 75.")
+
+asyncio.run(main())</code></pre>
+</details>
     ]]></description>
     <guid isPermaLink="false">langchain-ai/langchain-2026-02-25</guid>
     <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
   </item>
   
   <item>
-    <title>anthropic-sdk-python - v0.84.0 - MCP Tools, Prompts, and Resources Conversion Helpers</title>
-    <link>https://github.com/anthropics/anthropic-sdk-python</link>
-    <description><![CDATA[
-      <h3>🚀 What's New</h3>
-<p>This release introduces conversion helpers for MCP tools, prompts, and resources, along with several API improvements and internal optimizations. The SDK has been rebranded to 'Claude SDK' with a streamlined README.</p>
-<h3>💡 Why It Matters</h3>
-<ul>
-<li><strong>MCP Tools, Prompts, and Resources Conversion Helpers</strong>: Developers can now easily convert between MCP tools, prompts, and resources using the new helper functions. This simplifies integration with Model Context Protocol (MCP) servers and enables seamless data transformation between different formats. Previously, developers had to manually handle these conversions, which was error-prone and time-consuming.</li>
-<li><strong>Array Format Changed to Brackets</strong>: The API now uses bracket notation for array parameters instead of the previous format. This aligns with standard HTTP conventions and improves compatibility with various HTTP clients and proxies. The change ensures more predictable behavior when sending array parameters in API requests.</li>
-<li><strong>Publishing Section Removed from CLI Target</strong>: The CLI target no longer includes the publishing section, streamlining the command-line interface and reducing complexity. This change makes the CLI more focused on core functionality and improves the user experience for developers who primarily use the SDK through code rather than the CLI.</li>
-<li><strong>Top-Level Cache Control Added</strong>: Automatic caching is now available at the top level, allowing developers to easily enable caching for API responses. This improves performance by reducing redundant API calls and enables better resource utilization. The cache control can be configured globally or per-request, providing flexibility for different use cases.</li>
-<li><strong>SDK Rebranded to Claude SDK</strong>: The SDK has been rebranded from 'Anthropic SDK' to 'Claude SDK' with a streamlined README. This change reflects the product's evolution and provides clearer branding for users. The updated documentation makes it easier for new users to get started and understand the SDK's capabilities.</li>
-</ul>
-<h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from anthropic import Anthropic
-from anthropic.helpers import convert_mcp_tool, convert_mcp_prompt, convert_mcp_resource
-
-# Initialize client
-client = Anthropic()
-
-# Convert MCP tool to SDK format
-mcp_tool = {
-    "name": "search",
-    "description": "Search documents",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "query": {"type": "string"}
-        }
-    }
-}
-converted_tool = convert_mcp_tool(mcp_tool)
-
-# Convert MCP prompt to SDK format
-mcp_prompt = {
-    "name": "summarize",
-    "description": "Summarize text",
-    "prompt": "Please summarize the following text: {text}"
-}
-converted_prompt = convert_mcp_prompt(mcp_prompt)
-
-# Convert MCP resource to SDK format
-mcp_resource = {
-    "name": "document",
-    "description": "Document content",
-    "content": "This is a sample document."
-}
-converted_resource = convert_mcp_resource(mcp_resource)
-
-# Use with API
-messages = [
-    {"role": "user", "content": "Search for information about MCP tools"},
-    {"role": "tool", "name": converted_tool.name, "input": {"query": "MCP tools"}}
-]
-
-response = client.messages.create(
-    model="claude-3-5-sonnet-20241022",
-    max_tokens=1000,
-    messages=messages,
-    cache_control={"type": "ephemeral"}  # Use top-level cache control
-)
-
-print(response.content)</code></pre>
-    ]]></description>
-    <guid isPermaLink="false">anthropics/anthropic-sdk-python-2026-02-25</guid>
-    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
-  </item>
-  
-  <item>
-    <title>ragflow - RAGFlow v0.24.0</title>
-    <link>https://github.com/infiniflow/ragflow</link>
-    <description><![CDATA[
-      <h3>🚀 What's New</h3>
-<p>RAGFlow 0.24.0 introduces comprehensive memory management capabilities, enhanced agent chat interfaces, improved dataset governance, and expanded ecosystem support. The release focuses on observability, developer integration, and real-world deployment challenges.</p>
-<h3>💡 Why It Matters</h3>
-<ul>
-<li><strong>Memory Management API</strong>: Previously, memory operations were opaque and difficult to integrate programmatically. This release introduces RESTful APIs and Python SDK for comprehensive memory CRUD operations, intelligent retrieval via keyword and semantic similarity searches, and session-based organization. Developers can now seamlessly integrate memory persistence into conversational applications without building custom backends.</li>
-<li><strong>Memory Extraction Logging</strong>: Memory extraction was previously a black-box process with no visibility into failures or performance bottlenecks. The new console displays extraction status, processing steps, success/failure indicators, and timestamps for every memory operation. This observability enables developers to debug memory pipeline issues, optimize extraction parameters, and ensure reliable memory persistence in production deployments.</li>
-<li><strong>Agent Chat Management Interface</strong>: Agent interactions were previously limited to embedded pages or custom frontend development. The new chat interface provides a consistent, session-preserving conversation management system with a dedicated Launch button. All dialogue histories are retained, enabling users to resume conversations, review past interactions, and maintain context across sessions without losing conversation state.</li>
-<li><strong>Multi-Sandbox Support</strong>: Agent execution was previously constrained to single sandbox environments. The new multi-Sandbox mechanism supports local gVisor and Alibaba Cloud with mainstream Sandbox API compatibility. This enables secure, isolated agent execution across different deployment environments while maintaining consistent API interfaces for containerized applications and cloud deployments.</li>
-<li><strong>Batch Metadata Management</strong>: Metadata configuration for multiple files was previously a manual, file-by-file process. The new batch management capability allows users to configure metadata across multiple documents simultaneously, dramatically reducing setup time for large knowledge bases and ensuring consistent metadata application across entire document collections.</li>
-<li><strong>Enhanced Chat Retrieval Strategies</strong>: Deep-research scenarios previously suffered from poor recall accuracy due to suboptimal retrieval strategies. The optimized retrieval algorithms improve recall rates, ensuring more relevant documents are retrieved for complex queries. This enhancement is critical for applications requiring comprehensive information synthesis from large knowledge bases.</li>
-<li><strong>Model Connection Testing</strong>: Adding new models previously required trial-and-error to verify connectivity and configuration. The new model connection test feature validates model endpoints, authentication, and configuration parameters before deployment, preventing runtime failures and ensuring reliable model integration in production environments.</li>
-</ul>
-<h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from ragflow import MemoryClient
-
-# Initialize memory client
-client = MemoryClient(
-    endpoint='http://localhost:8000',
-    api_key='your_api_key'
-)
-
-# Create a new memory
-memory = client.create_memory(
-    name='customer_conversation',
-    description='Customer support interactions'
-)
-
-# Add memory entry
-entry = memory.add_entry(
-    content='User asked about refund policy',
-    metadata={'user_id': '12345', 'timestamp': '2026-02-25T10:00:00Z'},
-    tags=['support', 'refund']
-)
-
-# Retrieve memories by keyword
-results = client.search_memories(
-    query='refund policy',
-    session_id='support_session_1'
-)
-
-print(f'Found {len(results)} relevant memories')
-for result in results:
-    print(f'- {result.content[:100]}...')
-
-# Update memory entry
-entry.update(metadata={'status': 'resolved'})
-
-# Delete memory
-memory.delete()</code></pre>
-    ]]></description>
-    <guid isPermaLink="false">infiniflow/ragflow-2026-02-25</guid>
-    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
-  </item>
-  
-  <item>
-    <title>mindsdb - v26.0.0 - Major Release with Breaking Changes</title>
-    <link>https://github.com/mindsdb/mindsdb</link>
-    <description><![CDATA[
-      <h3>🚀 What's New</h3>
-<p>This release introduces significant improvements across SQL capabilities, integrations, Knowledge Bases, and security. Key highlights include fixes for GROUP BY WITH ROLLUP, enhanced memory handling with DuckDB, static README integration, pgvector as default Knowledge Base store, and numerous security upgrades. The release also deprecates several handlers and introduces breaking changes.</p>
-<h3>💡 Why It Matters</h3>
-<ul>
-<li><strong>GROUP BY WITH ROLLUP Fix</strong>: The GROUP BY WITH ROLLUP functionality has been made more reliable and robust, fixing issues that previously caused incorrect aggregation results or query failures. This ensures accurate hierarchical data analysis and reporting, particularly important for financial and business intelligence applications where rollup operations are critical for generating summary reports.</li>
-<li><strong>DuckDB Memory Management</strong>: Proper handling and utilization of memory when DuckDB is used has been implemented, preventing memory leaks and optimizing resource allocation. This improvement is crucial for large-scale data processing tasks, as it ensures stable performance during complex analytical queries and prevents system crashes due to memory exhaustion.</li>
-<li><strong>Static README Integration</strong>: README files for integrations are now pulled statically from GitHub instead of requiring local storage. This reduces the application footprint, ensures users always have access to the latest documentation, and simplifies the deployment process by eliminating the need to maintain local documentation files.</li>
-<li><strong>pgvector Default Knowledge Base</strong>: The default Knowledge Base store in Docker-compose has been switched to pgvector, providing enhanced performance for vector operations and similarity searches. This change significantly improves the speed and accuracy of semantic search capabilities, making it ideal for RAG applications and AI-powered search features.</li>
-<li><strong>Security Upgrades</strong>: Numerous security upgrades have been implemented across multiple packages including urllib3, starlette, keras, protobuf, numpy, and others. These updates address known vulnerabilities and ensure the system remains secure against emerging threats, protecting sensitive data and maintaining compliance with security standards.</li>
-</ul>
-<h3>🛠️ Try It Out</h3>
-<pre><code class="language-bash"># Update to v26.0.0 (Note: Contains breaking changes)
-# Backup your configuration before upgrading
-
-# Pull the latest image
-docker pull mindsdb/mindsdb:latest
-
-# Stop existing container
-docker stop mindsdb
-
-# Remove existing container
-docker rm mindsdb
-
-# Start new container with pgvector as default
-# Note: This uses the new default configuration
-docker run -d --name mindsdb \
-  -p 47334:47334 \
-  -p 47335:47335 \
-  -v mindsdb_storage:/storage \
-  mindsdb/mindsdb:latest
-
-# Verify the new version
-docker logs mindsdb | grep "MindsDB version"
-
-# Test pgvector integration
-# Create a new knowledge base using pgvector
-docker exec mindsdb mindsdb --api=http --config "knowledge_base_engine=pgvector"
-
-# Test the GROUP BY WITH ROLLUP fix
-# Connect to MindsDB and run a test query
-docker exec -it mindsdb psql -h localhost -p 47335 -U mindsdb
-# Then run: SELECT * FROM table GROUP BY WITH ROLLUP column1, column2;</code></pre>
-    ]]></description>
-    <guid isPermaLink="false">mindsdb/mindsdb-2026-02-25</guid>
-    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
-  </item>
-  
-  <item>
-    <title>agno - Agno v2.5.5 - Slack Interface, ModelsLab Image Generation, and Bug Fixes</title>
+    <title>agno - v2.5.5</title>
     <link>https://github.com/agno-agi/agno</link>
     <description><![CDATA[
       <h3>🚀 What's New</h3>
-<p>This release introduces real-time streaming for Slack interfaces with live progress cards, adds image generation capabilities to ModelsLabTools, and includes several critical bug fixes for Gemini, AWS Bedrock, and workflow image handling.</p>
-<h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Slack Interface Real-time Streaming</strong>: The Slack interface now supports real-time streaming with live progress cards for tool calls, reasoning, and workflow steps. This transforms the user experience from static responses to dynamic, interactive conversations where users can see the agent's thought process unfold in real-time. Each Slack instance can now use its own token and signing_secret, enabling multiple bots on the same server without conflicts.</li>
-<li><strong>ModelsLab Image Generation</strong>: ModelsLabTools now supports image generation via ModelsLab's text-to-image API, completing the full media suite. This allows agents to generate images directly from text descriptions, enabling use cases like creating visual content, generating charts, or producing illustrations as part of workflows. The integration provides PNG/JPG output formats and integrates seamlessly with existing ModelsLab media tools.</li>
-<li><strong>Gemini API Empty Message Fix</strong>: Fixed a critical bug where empty message parts were causing request failures when sending conversations to the Gemini API. Previously, agents would crash or fail when processing conversations with empty segments, disrupting workflows. This fix ensures robust conversation handling by filtering out empty parts before API calls, making Gemini integration more reliable for production use.</li>
-<li><strong>AWS Bedrock Tool Result Merging</strong>: Improved AWS Bedrock integration by merging consecutive toolResult blocks into single user messages. This enhancement creates more natural conversation flows by consolidating multiple tool outputs into cohesive responses, reducing message fragmentation and improving the overall user experience when using Bedrock models with tool calling capabilities.</li>
-<li><strong>Workflow Image Artifact Handling</strong>: Enhanced workflow step processing to handle raw image bytes in _convert_image_artifacts_to_images. This fix ensures workflows can properly process and convert image artifacts, preventing failures when dealing with binary image data. It's particularly important for workflows that generate or manipulate images as part of their execution pipeline.</li>
-<li><strong>Knowledge Filter Serialization</strong>: Fixed serialization of FilterExpr objects in GET /agents and /teams responses. This ensures that complex filter expressions are properly serialized and deserialized when retrieving agent and team configurations via the API, preventing configuration loss and enabling reliable programmatic management of agents and teams.</li>
+<li>Slack interface responses now stream in real-time with live progress cards for tool calls, reasoning, and workflow steps.</li>
+<li>Each Slack instance now supports its own `token` and `signing_secret`, enabling multiple bots on the same server.</li>
+<li>ModelsLabTools has been extended to support image generation via ModelsLab's text-to-image API.</li>
+<li>Fixed empty message parts causing request failures when sending conversations to the Gemini API.</li>
+<li>AWS Bedrock now merges consecutive `toolResult` blocks into single user messages.</li>
+<li>Workflows now correctly handle raw image bytes in workflow step’s `_convert_image_artifacts_to_images`.</li>
+<li>Knowledge Filters now serialize FilterExpr objects in GET /agents and /teams responses.</li>
 </ul>
+<h3>💡 Why It's Important</h3>
+<p>This release significantly enhances user interaction and developer flexibility. The real-time streaming of Slack responses with live progress cards transforms the user experience by providing immediate feedback on complex operations, making bot interactions feel more dynamic and transparent. For developers, the ability to configure multiple Slack bots on a single server with independent credentials simplifies multi-bot deployments and improves scalability. The addition of image generation to ModelsLabTools completes its media suite, opening up new possibilities for creative AI applications directly within workflows. Furthermore, critical bug fixes for Gemini and AWS Bedrock ensure more robust and reliable API interactions, preventing common conversation failures and streamlining message processing. Workflow and Knowledge Filter improvements contribute to more stable and manageable agent systems, particularly when dealing with multimedia content and complex filter configurations.</p>
 <h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from agno import Agent, SlackInterface, ModelsLabTools
+<details class='try-it-level'>
+<summary>🟢 Basic Image Generation</summary>
+<pre><code class="language-python">from agno_tools.modelslab import ModelsLabTools
 
-# Slack Interface with Real-time Streaming
-agent = Agent(
-    tools=[ModelsLabTools()],
-    interfaces=[
-        SlackInterface(
-            token="xoxb-your-slack-token",
-            signing_secret="your-signing-secret",
-            enable_streaming=True  # Enables real-time progress cards
-        )
+# Replace with your actual ModelsLab API key
+modelslab = ModelsLabTools(api_key="YOUR_MODELSLAB_API_KEY")
+
+# Generate a simple image
+image_url = modelslab.generate_image("a futuristic city at sunset")
+print(f"Generated image URL: {image_url}")</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Customized Image Generation</summary>
+<pre><code class="language-python">from agno_tools.modelslab import ModelsLabTools
+
+# Replace with your actual ModelsLab API key
+modelslab = ModelsLabTools(api_key="YOUR_MODELSLAB_API_KEY")
+
+# Generate an image with specific parameters
+image_url = modelslab.generate_image(
+    prompt="a majestic lion in the savanna, photorealistic",
+    size="1024x1024",
+    quality="hd",
+    style="vivid"
+)
+print(f"Generated HD image URL: {image_url}")</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Image Generation and Local Save</summary>
+<pre><code class="language-python">import requests
+from agno_tools.modelslab import ModelsLabTools
+
+def save_image_from_url(url, filename="generated_image.png"):
+    """Downloads an image from a URL and saves it locally."""
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status() # Raise an exception for HTTP errors
+        with open(filename, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"Image successfully saved to {filename}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading image: {e}")
+
+# Replace with your actual ModelsLab API key
+modelslab = ModelsLabTools(api_key="YOUR_MODELSLAB_API_KEY")
+
+try:
+    image_url = modelslab.generate_image(
+        prompt="an astronaut riding a horse on the moon, cinematic lighting",
+        size="1792x1024",
+        format="png"
+    )
+    print(f"Generated image URL: {image_url}")
+    save_image_from_url(image_url, "moon_astronaut.png")
+except Exception as e:
+    print(f"An error occurred during image generation or saving: {e}")</code></pre>
+</details>
+    ]]></description>
+    <guid isPermaLink="false">agno-agi/agno-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>vllm - vLLM v0.16.0</title>
+    <link>https://github.com/vllm-project/vllm</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<ul>
+<li>Full support for Async scheduling and Pipeline Parallelism, delivering 30.8% E2E throughput improvement and 31.8% TPOT improvement.</li>
+<li>Introduced a new WebSocket-based Realtime API enabling streaming audio interactions.</li>
+<li>Added native NCCL-based weight syncing API for RLHF workflows, alongside layerwise weight reloading for QeRL and engine pause/resume with request preservation.</li>
+<li>Implemented Unified Parallel Drafting for speculative decoding, now supporting structured outputs and penalty application in Model Runner V2.</li>
+<li>Overhauled XPU platform, deprecating IPEX in favor of vllm-xpu-kernels and adding MoE, MXFP4 MoE, WNA16, scaled_mm, and FP8 MoE support.</li>
+<li>Expanded model support with new architectures including GLM-OCR, Qwen3-ASR, DeepSeek-OCR-2, Intern-S1-Pro, MiniCPM-o 4.5, openPangu7B-VL, NemotronHPuzzle, MusicFlamingo, FunAudioChat, ColBERT, voyage-4-nano, and GLM-5.</li>
+<li>Enhanced speculative decoding with support for EAGLE3 (Hunyuan/HunyuanVL), AFMoE, and Mistral3 models.</li>
+<li>Improved LoRA expansion with Gemma3 vision components, Nemotron-H MTP models, Qwen3 output embedding, and optimized fused MoE-LoRA kernel indexing.</li>
+<li>Introduced the Helion kernel framework, including ConfigManager, kernel wrapper, and kernel registry.</li>
+<li>Applied PluggableLayer to linear layers and Mamba layers.</li>
+<li>Enabled Triton attention and disabled Cascade Attention for improved batch invariance.</li>
+<li>Fixed a CPU memory leak related to Request reference cycles in prefix caching.</li>
+<li>Integrated FlashInfer TRTLLM BF16 MoE and added SM100 INT4 W4A16 kernel support for NVIDIA GPUs, along with SM121 (DGX Spark) CUTLASS support.</li>
+</ul>
+<h3>💡 Why It's Important</h3>
+<p>This release significantly boosts vLLM's capabilities and performance across multiple dimensions, making it more versatile and efficient for demanding AI applications. The full support for Async scheduling and Pipeline Parallelism is a game-changer, delivering substantial throughput and TPOT improvements. This means developers can serve more requests with lower latency, crucial for real-time applications and cost-effective inference at scale, effectively allowing more concurrent users or larger batch sizes without compromising responsiveness. The introduction of a WebSocket-based Realtime API for streaming audio interactions opens up new possibilities for building interactive voice AI experiences, moving beyond traditional request-response models to enable continuous, low-latency processing of live audio streams. Furthermore, the comprehensive overhaul of the XPU platform, along with expanded model and speculative decoding support, ensures vLLM remains at the forefront of hardware acceleration and model compatibility, allowing users to leverage the latest architectures and achieve optimal performance on diverse hardware. These enhancements collectively empower developers to build more performant, responsive, and feature-rich AI applications with greater ease and efficiency, addressing critical bottlenecks in large-scale LLM deployment.</p>
+<h3>🛠️ Try It Out</h3>
+<details class='try-it-level'>
+<summary>🟢 Basic Async Inference</summary>
+<pre><code class="language-python">import asyncio
+from vllm.engine.async_llm_engine import AsyncLLMEngine
+from vllm.sampling_params import SamplingParams
+
+async def main():
+    # Initialize the async LLM engine with a pre-trained model
+    engine = AsyncLLMEngine.from_engine_args(
+        model="mistralai/Mistral-7B-Instruct-v0.2",
+        engine_args={
+            "tensor_parallel_size": 1 # Use 1 GPU for simplicity
+        }
+    )
+
+    # Define sampling parameters
+    sampling_params = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=64)
+
+    # Generate a completion for a single prompt
+    request_id = "my_request_001"
+    prompt = "Hello, my name is"
+    results_generator = engine.generate(prompt, sampling_params, request_id)
+
+    async for request_output in results_generator:
+        if request_output.finished:
+            print(f"Prompt: {request_output.prompt}")
+            print(f"Generated text: {request_output.outputs[0].text}")
+            break # For a single prompt, we only care about the final output
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Concurrent Async Inference with Batching</summary>
+<pre><code class="language-python">import asyncio
+from vllm.engine.async_llm_engine import AsyncLLMEngine
+from vllm.sampling_params import SamplingParams
+
+async def main():
+    # Initialize the async LLM engine, potentially with pipeline parallelism
+    engine = AsyncLLMEngine.from_engine_args(
+        model="mistralai/Mistral-7B-Instruct-v0.2",
+        engine_args={
+            "tensor_parallel_size": 2, # Example: utilize 2 GPUs for parallelism
+            "gpu_memory_utilization": 0.8 # Allocate 80% of GPU memory
+        }
+    )
+
+    prompts = [
+        "What is the capital of France?",
+        "Write a short poem about a cat.",
+        "Explain the concept of quantum entanglement in simple terms."
+    ]
+    sampling_params = SamplingParams(temperature=0.8, top_p=0.9, max_tokens=128, stop=["\n\n"])
+
+    # Submit multiple requests concurrently
+    tasks = []
+    for i, prompt in enumerate(prompts):
+        request_id = f"request_{i}"
+        tasks.append(engine.generate(prompt, sampling_params, request_id))
+
+    # Collect results as they become available
+    all_results_generators = await asyncio.gather(*tasks)
+
+    for i, results_generator in enumerate(all_results_generators):
+        full_text = ""
+        async for request_output in results_generator:
+            if request_output.finished:
+                full_text = request_output.outputs[0].text
+                break
+        print(f"Prompt {i}: {prompts[i]}")
+        print(f"Generated text {i}: {full_text}\n")
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Realtime Streaming Audio (Hypothetical Client)</summary>
+<pre><code class="language-python">import asyncio
+import websockets
+import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+# This is a hypothetical client for the new WebSocket-based Realtime API.
+# The actual implementation would depend on vLLM's server-side API for audio streaming.
+async def realtime_audio_stream_example(audio_data_chunks):
+    uri = "ws://localhost:8000/realtime/audio" # Hypothetical WebSocket endpoint
+    logging.info(f"Connecting to {uri}...")
+    try:
+        async with websockets.connect(uri) as websocket:
+            logging.info("WebSocket connection established.")
+
+            # Send initial configuration (e.g., model, language)
+            config_message = {
+                "type": "config",
+                "model": "qwen3-asr", # Example model from 'Model Support' section
+                "language": "en-US",
+                "sampling_rate": 16000
+            }
+            await websocket.send(json.dumps(config_message))
+            logging.info("Sent configuration.")
+
+            # Stream audio chunks
+            for i, chunk in enumerate(audio_data_chunks):
+                audio_message = {
+                    "type": "audio",
+                    "data": chunk.hex(), # Assuming hex-encoded binary audio data
+                    "sequence_num": i
+                }
+                await websocket.send(json.dumps(audio_message))
+                logging.info(f"Sent audio chunk {i}.")
+                await asyncio.sleep(0.1) # Simulate real-time streaming delay
+
+            # Indicate end of audio stream
+            await websocket.send(json.dumps({"type": "end_stream"}))
+            logging.info("Sent end_stream signal.")
+
+            # Receive and process transcription results
+            async for message in websocket:
+                response = json.loads(message)
+                if response.get("type") == "transcription_update":
+                    logging.info(f"Transcription update: {response.get('text')}")
+                elif response.get("type") == "final_transcription":
+                    logging.info(f"Final transcription: {response.get('text')}")
+                    break
+                elif response.get("type") == "error":
+                    logging.error(f"Realtime API error: {response.get('message')}")
+                    break
+
+    except websockets.exceptions.ConnectionClosedOK:
+        logging.info("WebSocket connection closed gracefully.")
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+
+async def main():
+    # Simulate some audio data chunks (e.g., from a microphone or file)
+    # In a real scenario, this would come from an audio input device or a generator.
+    dummy_audio_chunks = [b"\x00\x01\x02\x03", b"\x04\x05\x06\x07", b"\x08\x09\x0A\x0B", b"\x0C\x0D\x0E\x0F"]
+    await realtime_audio_stream_example(dummy_audio_chunks)
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+</details>
+    ]]></description>
+    <guid isPermaLink="false">vllm-project/vllm-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+  </item>
+  
+  <item>
+    <title>anthropic-sdk-python - 0.84.0</title>
+    <link>https://github.com/anthropics/anthropic-sdk-python</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+<ul>
+<li>Changed API array_format to use brackets.</li>
+<li>Removed the publishing section from the CLI target.</li>
+<li>Added conversion helpers for MCP (Model Control Plane) tools, prompts, and resources.</li>
+<li>Added a missing method for raw JSONL results.</li>
+<li>Added request options to SSE (Server-Sent Events) classes.</li>
+<li>Improved resilience of proxy environment variable tests.</li>
+<li>Simplified HTTP snapshots.</li>
+<li>Updated JSONL tests.</li>
+<li>Rebranded the SDK to 'Claude SDK' and streamlined the README documentation.</li>
+</ul>
+<h3>💡 Why It's Important</h3>
+<p>This release introduces significant enhancements aimed at improving API consistency, developer tooling, and overall brand clarity. The change to using brackets for <code>array_format</code> in the API ensures better compatibility and adherence to common web standards, simplifying integration for developers. Crucially, new conversion helpers for MCP (Model Control Plane) tools, prompts, and resources will streamline workflows for users interacting with these advanced features, reducing the boilerplate code required for data manipulation. Furthermore, the SDK has been rebranded to 'Claude SDK' with an updated README, providing a clearer identity and a more intuitive onboarding experience for developers building with Claude.</p>
+<h3>🛠️ Try It Out</h3>
+<details class='try-it-level'>
+<summary>🟢 Quick Start with Claude</summary>
+<pre><code class="language-python">import anthropic
+
+# Ensure you have your ANTHROPIC_API_KEY set in your environment variables
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=100,
+    messages=[
+        {"role": "user", "content": "Hello, Claude! What can you do?"}
     ]
 )
 
-# Image Generation Example
-async def generate_image():
-    result = await agent.run(
-        "Create an image of a futuristic city skyline at sunset",
-        tools=[ModelsLabTools()]
-    )
-    print(f"Generated image URL: {result.image_url}")
+print(message.content[0].text)</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Using Tools (simplified by new helpers)</summary>
+<pre><code class="language-python">import anthropic
+from anthropic.types import MessageParam
 
-# Usage
+client = anthropic.Anthropic()
+
+# This example demonstrates a tool call pattern that new MCP helpers would simplify.
+# The helpers would abstract away some of the manual schema definition.
+weather_tool = {
+    "name": "get_current_weather",
+    "description": "Get the current weather in a given location",
+    "input_schema": {
+        "type": "object",
+        "properties": {"location": {"type": "string"}},
+        "required": ["location"]
+    }
+}
+
+messages: list[MessageParam] = [
+    {"role": "user", "content": "What's the weather like in San Francisco?"}
+]
+
+response = client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=500,
+    messages=messages,
+    tools=[weather_tool]
+)
+
+print(f"Claude's initial response: {response.content[0].text if response.content else 'No content'}")
+
+# If Claude decides to use the tool, you would then execute it and provide the result.</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Asynchronous Streaming with Error Handling</summary>
+<pre><code class="language-python">import anthropic
+import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+async def main():
+    client = anthropic.AsyncAnthropic()
+    try:
+        logging.info("Starting asynchronous streaming request...")
+        stream = await client.messages.stream(
+            model="claude-3-opus-20240229",
+            max_tokens=1024,
+            messages=[
+                {"role": "user", "content": "Write a short, inspiring haiku about technology and nature."}
+            ]
+        )
+        async with stream as s:
+            logging.info("Receiving stream chunks:")
+            async for chunk in s:
+                if chunk.type == "content_block_delta":
+                    print(chunk.delta.text, end="", flush=True)
+            print("\n--- Stream finished ---\n")
+    except anthropic.APIError as e:
+        logging.error(f"Anthropic API Error: Status {e.status_code} - Response: {e.response}")
+    except Exception as e:
+        logging.error(f"An unexpected error occurred: {e}")
+
 if __name__ == "__main__":
-    generate_image()</code></pre>
+    asyncio.run(main())</code></pre>
+</details>
     ]]></description>
-    <guid isPermaLink="false">agno-agi/agno-2026-02-25</guid>
+    <guid isPermaLink="false">anthropics/anthropic-sdk-python-2026-02-25</guid>
     <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
   </item>
   
@@ -264,146 +706,469 @@ if __name__ == "__main__":
     <link>https://github.com/huggingface/datasets</link>
     <description><![CDATA[
       <h3>🚀 What's New</h3>
-<p>This release adds comprehensive support for multimodal data in Lance datasets, including native handling of Image, Video, and Audio types. It introduces Xet deduplication for faster uploads/downloads, adds resharding capabilities for IterableDatasets, and includes various bug fixes and improvements.</p>
-<h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Multimodal Lance Dataset Support</strong>: Previously, Lance datasets required manual type inference for binary blobs. Now the library automatically detects and handles Image, Video, and Audio types, making it seamless to work with multimodal datasets. This eliminates the need for custom preprocessing pipelines when loading datasets like OpenVid-1M, significantly reducing setup complexity for computer vision and multimedia applications.</li>
-<li><strong>Video Type Support in push_to_hub</strong>: Before this update, pushing video datasets to the Hub required manual conversion and handling. Now you can directly push Video-typed datasets using push_to_hub(), with automatic type casting and proper handling of video blobs. This streamlines the workflow for sharing video datasets and ensures type consistency across the Hub ecosystem.</li>
-<li><strong>Xet Deduplication for Faster Transfers</strong>: Previously, converting between Lance and Parquet formats required re-uploading all binary assets, leading to slow transfers and wasted bandwidth. With Xet deduplication, the system reuses binary chunks across formats, making cross-format conversions nearly instantaneous. This is particularly valuable for large multimedia datasets where video and image assets dominate storage requirements.</li>
-<li><strong>IterableDataset Resharding</strong>: Large streaming datasets were previously limited by fixed shard counts, which could impact parallelism and performance. The new reshard() method allows dynamic splitting of shards, particularly effective for Parquet files where each row group becomes a shard. This enables better resource utilization in distributed processing and more granular control over data loading patterns.</li>
+<li>Added support for Image, Video, and Audio types in Lance datasets.</li>
+<li>Enabled automatic inference of media types (Image, Video, Audio) from Lance blobs.</li>
+<li>Extended `push_to_hub()` to support Video types.</li>
+<li>Implemented writing image/audio/video blobs directly to Parquet (PLAIN) format in `push_to_hub()` to enable cross-format Xet deduplication.</li>
+<li>Introduced `IterableDataset.reshard()` method to split existing shards into more granular ones, particularly for Parquet datasets (per row group).</li>
+<li>Fixed `load_from_disk` progress bar behavior when stdout is redirected.</li>
+<li>Fixed `interleave_datasets` with the `all_exhausted_without_replacement` strategy.</li>
+<li>Added support for null values within JSON string columns.</li>
+<li>Improved memory efficiency in `push_to_hub()` by utilizing temporary files.</li>
 </ul>
+<h3>💡 Why It's Important</h3>
+<p>This release significantly enhances the <code>datasets</code> library's capabilities for handling multimedia data, particularly video and audio. Previously, users faced challenges in efficiently managing, sharing, and processing large multimedia datasets within the Hugging Face ecosystem due to limited native type support and inefficient storage mechanisms. With the introduction of native Image, Video, and Audio type support for Lance datasets and <code>push_to_hub()</code>, developers can now seamlessly integrate rich media content into their data pipelines, making it easier to build and share advanced multimedia AI applications. The new Xet deduplication feature, enabled by writing media blobs directly to Parquet, drastically reduces upload times and storage requirements when converting or updating datasets, as binary chunks are intelligently reused across different formats. Furthermore, the <code>IterableDataset.reshard()</code> method provides finer-grained control over dataset partitioning, allowing users to optimize streaming performance and parallelism, especially for large Parquet datasets, by splitting shards per row group instead of per file. These improvements streamline the workflow for multimedia AI, making it easier and faster to build, share, and process rich media datasets.</p>
 <h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from datasets import load_dataset
+<details class='try-it-level'>
+<summary>🟢 Load Lance Dataset with Media Types</summary>
+<pre><code class="language-python">from datasets import load_dataset, Video, Value
 
-# Load a video dataset with automatic type inference
+# Load a Lance dataset that contains video data in streaming mode
+# The library will now infer Video() types automatically from Lance blobs
 ds = load_dataset("lance-format/Openvid-1M", streaming=True, split="train")
-print(ds.features)  # Shows Video() type for video_blob
 
-# Push a video dataset to the Hub
+print("Dataset features with inferred media types:")
+print(ds.features)
+# Expected output will show 'video_blob': Video() among other features</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Push Video Dataset to Hugging Face Hub</summary>
+<pre><code class="language-python">import os
+import tempfile
 from datasets import Dataset, Video
-video_ds = Dataset.from_dict({"video": ["path/to/video.mp4"]})
-video_ds = video_ds.cast_column("video", Video())
-video_ds.push_to_hub("username/my-video-dataset")
 
-# Reshard a streaming dataset for better parallelism
-parquet_ds = load_dataset("fancyzhx/amazon_polarity", split="train", streaming=True)
-resharded_ds = parquet_ds.reshard()
-print(f"Original shards: {parquet_ds.num_shards}, Resharded: {resharded_ds.num_shards}")</code></pre>
+# Create a dummy video file for demonstration purposes
+# In a real application, 'path/to/video.mp4' would be an actual video file
+temp_dir = tempfile.mkdtemp()
+dummy_video_path = os.path.join(temp_dir, "example_video.mp4")
+with open(dummy_video_path, "wb") as f:
+    f.write(b"This is not a real video, just dummy content.")
+
+# Create a dataset from a dictionary, referencing the dummy video file
+ds = Dataset.from_dict({"video": [dummy_video_path]})
+
+# Cast the 'video' column to the new Video feature type
+ds = ds.cast_column("video", Video())
+
+print("Dataset with Video column created:")
+print(ds)
+
+# To push this dataset to the Hugging Face Hub, you would uncomment the line below.
+# You need to be logged in (e.g., `huggingface-cli login`) and replace
+# "your-username/my-video-dataset" with your actual username and desired dataset name.
+# ds.push_to_hub("your-username/my-video-dataset")
+
+# Clean up the dummy file and directory (uncomment to enable)
+# import shutil
+# shutil.rmtree(temp_dir)</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Optimize Streaming with Dataset Resharding</summary>
+<pre><code class="language-python">from datasets import load_dataset
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+
+def process_resharded_dataset():
+    """
+    Demonstrates advanced usage of IterableDataset.reshard() for optimized processing.
+    This is particularly useful for large Parquet datasets to increase parallelism.
+    """
+    try:
+        # Load a dataset in streaming mode, which often starts with a limited number of shards
+        logging.info("Loading dataset 'fancyzhx/amazon_polarity' in streaming mode...")
+        ds = load_dataset("fancyzhx/amazon_polarity", split="train", streaming=True)
+        logging.info(f"Initial dataset: {ds}")
+        logging.info(f"Initial number of shards: {ds.num_shards}")
+
+        # Reshard the dataset to split existing shards further, e.g., per row group for Parquet.
+        # This can significantly increase the number of shards, enabling more granular processing
+        logging.info("Resharding the dataset to increase parallelism...")
+        resharded_ds = ds.reshard()
+        logging.info(f"Resharded dataset: {resharded_ds}")
+        logging.info(f"New number of shards after resharding: {resharded_ds.num_shards}")
+
+        # You can now iterate over the more granular shards, potentially in parallel.
+        # For demonstration, we'll just take a few examples.
+        logging.info("Fetching first 5 examples from the resharded dataset:")
+        for i, example in enumerate(resharded_ds):
+            if i >= 5:
+                break
+            logging.info(f"Example {i}: {example['title'][:50]}...")
+
+    except Exception as e:
+        logging.error(f"An error occurred during resharding or processing: {e}")
+        logging.info("Please ensure you have 'pyarrow' installed for Parquet support.")
+
+if __name__ == "__main__":
+    process_resharded_dataset()</code></pre>
+</details>
     ]]></description>
     <guid isPermaLink="false">huggingface/datasets-2026-02-25</guid>
     <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
   </item>
   
   <item>
-    <title>ComfyUI - v0.15.0</title>
-    <link>https://github.com/Comfy-Org/ComfyUI</link>
+    <title>ultralytics - v8.4.17 - `ultralytics 8.4.17` NDJSON dataset re-split support (#23735)</title>
+    <link>https://github.com/ultralytics/ultralytics</link>
     <description><![CDATA[
       <h3>🚀 What's New</h3>
-<p>This release introduces significant enhancements including basic text generation support with native models (initially supporting Gemma3), new audio processing capabilities with a 3-band equalizer node, improved API node functionality with ElevenLabs integration, and various performance optimizations and bug fixes.</p>
-<h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>Basic Text Generation Support</strong>: Adds native text generation capabilities to ComfyUI, initially supporting Gemma3 models. This eliminates the need for external text generation tools and allows users to integrate text generation directly into their AI workflows. Previously, users had to rely on separate text generation services or models, creating workflow fragmentation. Now, text generation can be seamlessly combined with image generation and other AI tasks within the same interface.</li>
-<li><strong>3-Band Equalizer Node for Audio</strong>: Introduces a new audio processing node that provides basic equalization capabilities with three frequency bands. This enhancement is particularly valuable for users working with audio-visual content or video generation workflows. Before this update, users had limited audio processing options within ComfyUI, requiring external audio editing tools. Now, basic audio adjustments can be performed directly within the ComfyUI environment, streamlining the creative process.</li>
-<li><strong>ElevenLabs API Node Integration</strong>: Adds support for ElevenLabs text-to-speech and voice generation services through new API nodes. This integration expands ComfyUI's capabilities into the audio domain, allowing users to generate realistic voiceovers and speech directly within their workflows. Previously, users needed to use separate services for voice generation and then manually integrate the results. This update creates a more cohesive environment for multimedia content creation.</li>
-<li><strong>Performance Optimizations for FP8 Workflows</strong>: Implements optimizations that limit the return of requants, specifically improving performance for FP8 dynamic_vram workflows. This addresses a critical performance bottleneck that affected users working with low-precision models and memory-constrained environments. The optimization reduces computational overhead and memory usage, making FP8 workflows more practical for real-world applications where resource efficiency is crucial.</li>
+<li>Added NDJSON dataset re-split support.</li>
+<li>Reuses previously downloaded images when changing train/val/test splits for NDJSON datasets.</li>
+<li>Removes existing `labels/` directory before NDJSON reconversion for non-classification tasks to prevent stale annotations.</li>
+<li>Moves images from other splits (train/val/test) before downloading if missing from the current split during NDJSON reconversion.</li>
+<li>Adds a content hash to `data.yaml` to skip NDJSON reconversion if no meaningful changes occurred.</li>
+<li>Deletes orphaned images no longer part of the dataset after an NDJSON resplit.</li>
+<li>Improved reliability of EdgeTPU exports.</li>
+<li>Automatically disables `end2end` mode for EdgeTPU exports and logs a warning.</li>
+<li>Improved OpenVINO INT8 export dependency handling.</li>
+<li>Added PyTorch 2.3 detection and adjusted `nncf` requirements for OpenVINO INT8 exports.</li>
+<li>Improved clarity of disk space error messages.</li>
+<li>Fixed incorrect 'GB' reporting in disk space error messages, now showing 'MB' for sizes under 1GB.</li>
 </ul>
+<h3>💡 Why It's Important</h3>
+<p>Previously, refining dataset splits in NDJSON workflows often required full re-downloads, consuming significant time and bandwidth. This update introduces intelligent re-splitting capabilities that reuse existing images, move files between splits, and skip unnecessary conversions, drastically accelerating the iteration process for data curation and experimentation. Users will experience faster workflows and reduced friction when adjusting their dataset splits. Furthermore, the automatic removal of old labels and orphaned images prevents subtle data mismatches that could silently degrade training quality. This ensures that models are trained on clean, consistent data, leading to more reliable and accurate results without unexpected 'gotchas' from stale background files. Deployment exports are also made more dependable; EdgeTPU exports will now automatically disable unsupported <code>end2end</code> mode, reducing failures, and OpenVINO INT8 export setups are smoother across different PyTorch versions due to improved dependency handling. This means fewer headaches when preparing models for various deployment targets. Finally, clearer disk space error messages, now reporting in MB for smaller sizes, enhance the user experience by providing accurate and understandable information when storage is a concern during downloads and conversions.</p>
 <h3>🛠️ Try It Out</h3>
-<pre><code class="language-python"># Example: Using the new text generation with Gemma3
-from pathlib import Path
+<details class='try-it-level'>
+<summary>🟢 Initial NDJSON Dataset Conversion</summary>
+<pre><code class="language-python"># Install Ultralytics: pip install ultralytics
+from ultralytics import YOLO
+import os
 
-# Load a Gemma3 model for text generation
-model_path = Path("path/to/gemma3/model")
+# Define a simple data.yaml for an NDJSON dataset
+# This file will be created in the current directory
+data_yaml_content = """
+path: ./datasets/my_ndjson_data
+train: https://ultralytics.com/assets/coco8.ndjson
+val: https://ultralytics.com/assets/coco8.ndjson
+nc: 80
+names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+"""
 
-# Create a text generation workflow
-# Note: This is a conceptual example as the actual implementation may vary
-# based on ComfyUI's specific API structure
+data_yaml_path = 'ndjson_data_beginner.yaml'
+with open(data_yaml_path, 'w') as f:
+    f.write(data_yaml_content)
 
-# Example workflow setup (pseudo-code)
-workflow = {
-    "nodes": [
-        {
-            "type": "TextEncode",
-            "inputs": {"text": "Generate a creative story about AI"}
-        },
-        {
-            "type": "Gemma3Generate",
-            "inputs": {"prompt": "Generate a creative story about AI"}
-        }
-    ]
-}
+print("--- Beginner: Initial NDJSON Dataset Conversion ---")
+print("This example performs an initial conversion of an NDJSON dataset.")
+print("Ultralytics will download images and generate labels based on 'ndjson_data_beginner.yaml'.")
 
-# Execute the workflow
-# result = comfyui.execute(workflow)
-# print(result)</code></pre>
+model = YOLO('yolov8n.pt') # A lightweight model to trigger dataset operations
+try:
+    # Running a short 'val' command triggers dataset preparation
+    model.val(data=data_yaml_path, imgsz=64, project='ndjson_demo', name='beginner_run', verbose=False)
+    print("\nInitial NDJSON dataset conversion completed successfully.")
+    print(f"Check the '{os.path.join('ndjson_demo', 'beginner_run')}' directory for results and dataset.")
+except Exception as e:
+    print(f"Error during initial conversion: {e}")
+finally:
+    # Clean up the dummy data.yaml
+    if os.path.exists(data_yaml_path):
+        os.remove(data_yaml_path)
+</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Demonstrating NDJSON Re-split</summary>
+<pre><code class="language-python"># Install Ultralytics: pip install ultralytics
+from ultralytics import YOLO
+import os
+import yaml
+import shutil
+
+# Define initial data.yaml
+initial_data_yaml_content = """
+path: ./datasets/my_ndjson_data_resplit
+train: https://ultralytics.com/assets/coco8.ndjson
+val: https://ultralytics.com/assets/coco8.ndjson
+nc: 80
+names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+"""
+data_yaml_path = 'ndjson_data_intermediate.yaml'
+
+project_dir = 'ndjson_resplit_demo'
+if os.path.exists(project_dir):
+    shutil.rmtree(project_dir)
+
+with open(data_yaml_path, 'w') as f:
+    f.write(initial_data_yaml_content)
+
+print("--- Intermediate: Demonstrating NDJSON Re-split ---")
+print("This example shows how Ultralytics reuses images and cleans labels during a re-split.")
+
+model = YOLO('yolov8n.pt')
+
+try:
+    # Step 1: Initial conversion
+    print("\nStep 1: Performing initial dataset conversion...")
+    model.val(data=data_yaml_path, imgsz=64, project=project_dir, name='run1', verbose=False)
+    print("Initial conversion completed. Images and labels are now in place.")
+
+    # Step 2: Simulate a split change (e.g., by changing the val URL)
+    # In a real scenario, you might point to a different NDJSON file or modify the source.
+    print("\nStep 2: Simulating a split change by modifying the 'val' dataset URL.")
+    print("Ultralytics will detect this change and perform an intelligent re-split.")
+
+    # Load and modify the data.yaml content
+    with open(data_yaml_path, 'r') as f:
+        data = yaml.safe_load(f)
+    # Change the validation URL to simulate a different split or version
+    data['val'] = 'https://ultralytics.com/assets/coco8.ndjson?version=new_split' # A dummy change
+    with open(data_yaml_path, 'w') as f:
+        yaml.dump(data, f, sort_keys=False)
+
+    # Re-run the dataset operation
+    print("Re-running dataset validation with modified splits...")
+    model.val(data=data_yaml_path, imgsz=64, project=project_dir, name='run2', verbose=False)
+    print("\nRe-split conversion completed.")
+    print("Observe the logs for 'run2': Ultralytics should indicate reusing images and cleaning stale labels,")
+    print("demonstrating the efficiency of the new re-split support.")
+except Exception as e:
+    print(f"Error during re-split demonstration: {e}")
+finally:
+    # Clean up the dummy data.yaml and project directory
+    if os.path.exists(data_yaml_path):
+        os.remove(data_yaml_path)
+    if os.path.exists(project_dir):
+        shutil.rmtree(project_dir)
+</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Production-Ready NDJSON Workflow with Re-split</summary>
+<pre><code class="language-python"># Install Ultralytics: pip install ultralytics
+from ultralytics import YOLO
+import os
+import yaml
+import logging
+import shutil
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+
+def create_or_update_data_yaml(output_dir, train_url, val_url, test_url=None, nc=80, names=None, filename='data.yaml'):
+    """Creates or updates a data.yaml for an NDJSON dataset."""
+    data_yaml_path = os.path.join(output_dir, filename)
+    data = {
+        'path': os.path.join(output_dir, 'dataset'), # Where images/labels will be stored
+        'train': train_url,
+        'val': val_url,
+        'nc': nc,
+        'names': names if names else [f'class{i}' for i in range(nc)]
+    }
+    if test_url:
+        data['test'] = test_url
+
+    os.makedirs(output_dir, exist_ok=True)
+    with open(data_yaml_path, 'w') as f:
+        yaml.dump(data, f, sort_keys=False)
+    logging.info(f"Created/Updated data.yaml at: {data_yaml_path}")
+    return data_yaml_path
+
+def run_dataset_operation(data_yaml_path, project_name, run_name):
+    """Triggers dataset preparation via a dummy validation run."""
+    model = YOLO('yolov8n.pt') # A lightweight model for just triggering data prep
+    logging.info(f"Starting dataset operation for run: {run_name}")
+    try:
+        # Use a validation run to trigger dataset download/conversion
+        model.val(data=data_yaml_path, imgsz=64, project=project_name, name=run_name, save=False, plots=False, verbose=True)
+        logging.info(f"Dataset operation for '{run_name}' completed.")
+        # After conversion, Ultralytics might update the data.yaml with a content_hash
+        with open(data_yaml_path, 'r') as f:
+            post_conversion_data = yaml.safe_load(f)
+            if 'content_hash' in post_conversion_data:
+                logging.info(f"Content hash found in data.yaml: {post_conversion_data['content_hash']}")
+            else:
+                logging.warning("Content hash not found in data.yaml after conversion (might be internal or not yet written).")
+    except Exception as e:
+        logging.error(f"Error during dataset operation for '{run_name}': {e}")
+        raise
+
+if __name__ == "__main__":
+    base_project_dir = 'ndjson_advanced_workflow'
+    initial_train_url = 'https://ultralytics.com/assets/coco8.ndjson'
+    initial_val_url = 'https://ultralytics.com/assets/coco8.ndjson'
+    common_names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+
+    # Clean up previous runs if any
+    if os.path.exists(base_project_dir):
+        shutil.rmtree(base_project_dir)
+        logging.info(f"Cleaned up previous project directory: {base_project_dir}")
+
+    try:
+        # Step 1: Initial dataset setup and conversion
+        logging.info("\n--- Advanced: Initial NDJSON Dataset Setup and Conversion ---")
+        data_yaml_path_1 = create_or_update_data_yaml(
+            output_dir=base_project_dir,
+            train_url=initial_train_url,
+            val_url=initial_val_url,
+            nc=80,
+            names=common_names,
+            filename='data_run1.yaml'
+        )
+        run_dataset_operation(data_yaml_path_1, base_project_dir, 'initial_conversion')
+
+        # Step 2: Simulate a split change and re-conversion
+        logging.info("\n--- Advanced: Simulating a Dataset Re-split with Modified Validation ---")
+        logging.info("Modifying data.yaml to point to a conceptually different validation split.")
+        # In a real scenario, this 'modified_val_url' would be a truly different NDJSON source
+        # or the original source would have been updated.
+        modified_val_url = 'https://ultralytics.com/assets/coco8.ndjson?version=2' # Simulate a change
+        data_yaml_path_2 = create_or_update_data_yaml(
+            output_dir=base_project_dir,
+            train_url=initial_train_url,
+            val_url=modified_val_url, # This is the key change
+            nc=80,
+            names=common_names,
+            filename='data_run2.yaml'
+        )
+        logging.info("Re-running dataset operation with the modified validation split.")
+        run_dataset_operation(data_yaml_path_2, base_project_dir, 'resplit_conversion')
+
+        logging.info("\n--- Expected Behavior ---")
+        logging.info("For 'initial_conversion', Ultralytics will download all images and create labels.")
+        logging.info("For 'resplit_conversion', Ultralytics will:")
+        logging.info("  - Detect the change in the validation split.")
+        logging.info("  - Reuse previously downloaded images from the 'initial_conversion' run.")
+        logging.info("  - Clean up stale labels from the previous validation split.")
+        logging.info("  - Only download/move new or changed images, significantly speeding up the process.")
+        logging.info("  - Update the 'content_hash' in the data.yaml if meaningful changes occurred.")
+    except Exception as e:
+        logging.error(f"An error occurred during the advanced workflow: {e}")
+    finally:
+        if os.path.exists(base_project_dir):
+            shutil.rmtree(base_project_dir)
+            logging.info(f"Cleaned up project directory: {base_project_dir}")
+</code></pre>
+</details>
     ]]></description>
-    <guid isPermaLink="false">Comfy-Org/ComfyUI-2026-02-24</guid>
-    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+    <guid isPermaLink="false">ultralytics/ultralytics-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
   </item>
   
   <item>
-    <title>docling - v2.75.0</title>
-    <link>https://github.com/docling-project/docling</link>
+    <title>mindsdb - v26.0.0</title>
+    <link>https://github.com/mindsdb/mindsdb</link>
     <description><![CDATA[
       <h3>🚀 What's New</h3>
-<p>This release introduces a backend parser for XBRL instance reports, unifies model-family inference engines with KServe v2 API support, and includes several bug fixes for document processing and ASR handling.</p>
-<h3>💡 Why It Matters</h3>
 <ul>
-<li><strong>XBRL Instance Reports Parser</strong>: Adds native support for parsing XBRL (eXtensible Business Reporting Language) instance reports, enabling financial and regulatory document processing directly within Docling. This eliminates the need for external XBRL parsers and provides seamless integration with other document types.</li>
-<li><strong>Unified Model-Family Inference Engines</strong>: Introduces a unified inference engine architecture that supports multiple model families including image classification, with KServe v2 API compatibility. This standardization simplifies deployment and management of AI models across different use cases, reducing configuration complexity and improving interoperability.</li>
-<li><strong>ASR Segment Length Validation</strong>: Fixes a bug where ASR (Automatic Speech Recognition) segments with zero length could cause processing errors. This ensures robust handling of audio transcripts and prevents crashes when processing incomplete or malformed speech data.</li>
-<li><strong>DOCX Hyperlink Safety</strong>: Adds protection against None hyperlink addresses in DOCX documents, preventing crashes when processing documents with broken or missing hyperlink references. This improves stability when handling real-world documents with inconsistent formatting.</li>
+<li>SQL `GROUP BY WITH ROLLUP` functionality was fixed for improved reliability.</li>
+<li>Validation was added to the `MINDSDB_DB_CON` environmental variable.</li>
+<li>The `track_column` parameter was made case-insensitive.</li>
+<li>SQL parsing was improved to prune ambiguous columns.</li>
+<li>SQL parsing was improved to accurately extract query targets in the API Handler.</li>
+<li>Memory handling and utilization for DuckDB were ensured.</li>
+<li>The available memory check in the Snowflake handler was updated and improved.</li>
+<li>Integration READMEs are now pulled statically from GitHub.</li>
+<li>Shopify, Confluence, Databrick, Hubspot, and Netsuite handlers were updated and improved.</li>
+<li>Additional validation was added for the targets list in the Shopify handler.</li>
+<li>Dspy, Chromedb, and all ML handlers were deprecated.</li>
+<li>Images were added to integration README files.</li>
+<li>The default Knowledge Base store in Docker-compose was switched to pgvector.</li>
+<li>Display of mixed case columns in the Knowledge Base was fixed.</li>
+<li>Knowledge Base ID duplicates on second insert were fixed.</li>
+<li>pgvector issues in Knowledge Base were fixed.</li>
+<li>Batches are now the default method for inserts in Knowledge Base.</li>
+<li>Rectifications were made in README locations, language permission issues, and Shopify handler query limits.</li>
+<li>Bugs related to file datasource visibility post Docker Upgrade and Query charting failure were fixed.</li>
+<li>Unnecessary files were deleted from the codebase for better readability.</li>
+<li>Numerous security upgrades were implemented for various packages including urllib3, starlette, keras, protobuf, numpy, aiohttp, fugue, sqlparse, filelock, azure-core, pyasn1, mintlify, sentencepiece, and marshmallow.</li>
 </ul>
+<h3>💡 Why It's Important</h3>
+<p>This release, v26.0.0, significantly enhances the stability, performance, and security of the MindsDB platform across multiple core components. SQL capabilities are more robust with fixes to complex operations like <code>GROUP BY WITH ROLLUP</code> and improved parsing, leading to more reliable query execution and reduced errors. The introduction of validation for <code>MINDSDB_DB_CON</code> and better memory management for DuckDB and Snowflake handlers directly translates to a more stable and efficient database interaction layer. Integration improvements, such as static READMEs and handler updates for major platforms like Shopify and Hubspot, streamline the developer experience and ensure more reliable connections. The deprecation of certain handlers signals a strategic move towards a cleaner, more focused codebase, potentially improving maintainability and performance. Furthermore, the switch to pgvector as the default Knowledge Base store in Docker-compose, alongside fixes for ID duplicates and batch inserts, boosts data integrity and performance for AI applications. Finally, a comprehensive suite of security upgrades across numerous packages fortifies the system against vulnerabilities, ensuring a safer and more trustworthy environment for all users. These changes collectively aim to provide a more dependable, performant, and secure platform for building and deploying AI-powered applications.</p>
 <h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from docling import Document
+<details class='try-it-level'>
+<summary>🟢 Quick Start: Connect and List Models</summary>
+<pre><code class="language-python">import mindsdb_client
 
-# Parse XBRL instance report
-xbrl_doc = Document.parse("financial_report.xbrl")
-print(f"Parsed {len(xbrl_doc.pages)} pages from XBRL report")
+# Ensure MindsDB is running and accessible (e.g., locally on default port)
+# pip install mindsdb_client
 
-# Use unified inference engine with KServe v2 API
-from docling.inference import UnifiedInferenceEngine
-engine = UnifiedInferenceEngine(model_family="image-classification")
-result = engine.predict(image_path="sample.jpg")
-print(f"Classification result: {result}")
+try:
+    connection = mindsdb_client.MindsDB(host='127.0.0.1', port=47334)
+    print("Successfully connected to MindsDB!")
+    
+    # Example: List available models
+    models = connection.sql.query("SHOW MODELS;")
+    print("\nAvailable Models:")
+    print(models.df)
+except Exception as e:
+    print(f"Failed to connect or query MindsDB: {e}")</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🟡 Create and Query a File Data Source</summary>
+<pre><code class="language-python">import mindsdb_client
 
-# Process DOCX with improved hyperlink handling
-docx_doc = Document.parse("document.docx")
-for paragraph in docx_doc.get_paragraphs():
-    if paragraph.hyperlink:
-        print(f"Link: {paragraph.hyperlink.text}")</code></pre>
+# This example assumes you have a 'my_data.csv' file in an accessible location.
+# Create a dummy 'my_data.csv' file if you don't have one:
+# column1,column2,target_column
+# valueA,valueX,10
+# valueB,valueY,20
+
+connection = mindsdb_client.MindsDB(host='127.00.1', port=47334)
+
+# Create a data source from a local CSV file
+create_datasource_query = """
+CREATE DATABASE my_csv_data
+FROM files (
+    PATH 'my_data.csv'
+);
+"""
+connection.sql.query(create_datasource_query)
+print("Data source 'my_csv_data' created.")
+
+# Query the data source
+query_data = connection.sql.query("SELECT * FROM my_csv_data.my_data LIMIT 5;")
+print("\nData from 'my_csv_data':")
+print(query_data.df)</code></pre>
+</details>
+<details class='try-it-level'>
+<summary>🔴 Train a Model and Make a Prediction</summary>
+<pre><code class="language-python">import mindsdb_client
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+def main():
+    try:
+        connection = mindsdb_client.MindsDB(host='127.0.0.1', port=47334)
+        logging.info("Connected to MindsDB.")
+
+        # This assumes 'my_csv_data' and 'my_data' table exist from the intermediate example.
+        # Replace 'target_column', 'feature1', 'feature2', and 'some_value' with actual columns/values from your CSV.
+        create_model_query = """
+        CREATE MODEL my_predictor
+        FROM my_csv_data
+        (SELECT * FROM my_data)
+        PREDICT target_column;
+        """
+        logging.info("Creating model 'my_predictor'...")
+        connection.sql.query(create_model_query)
+        logging.info("Model 'my_predictor' created (or training started).")
+
+        # Make a prediction using the created model
+        predict_query = """
+        SELECT T.feature1, T.feature2, M.target_column
+        FROM my_csv_data.my_data AS T
+        JOIN my_predictor AS M
+        WHERE T.feature1 = 'some_value'
+        LIMIT 1;
+        """
+        logging.info("Making a prediction with 'my_predictor'...")
+        prediction_result = connection.sql.query(predict_query)
+        logging.info("Prediction Result:")
+        logging.info(prediction_result.df)
+
+    except mindsdb_client.MindsDBAPIError as e:
+        logging.error(f"MindsDB API Error: {e.message} (Code: {e.code})")
+    except Exception as e:
+        logging.error(f"An unexpected error occurred: {e}")
+
+if __name__ == "__main__":
+    main()</code></pre>
+</details>
     ]]></description>
-    <guid isPermaLink="false">docling-project/docling-2026-02-24</guid>
-    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
-  </item>
-  
-  <item>
-    <title>langgraph - langgraph-sdk 0.3.9</title>
-    <link>https://github.com/langchain-ai/langgraph</link>
-    <description><![CDATA[
-      <h3>🚀 What's New</h3>
-<p>This release adds a new extract parameter to threads.search() for more granular data retrieval and includes a new make type target for type checking.</p>
-<h3>💡 Why It Matters</h3>
-<ul>
-<li><strong>Extract Parameter for threads.search()</strong>: Previously, the threads.search() method returned all thread data fields, which could be inefficient when only specific information was needed. The new extract parameter allows developers to specify exactly which fields to retrieve, reducing payload size and improving performance. This is particularly useful for applications that only need thread IDs or specific metadata without the full thread content, enabling more efficient data processing and reduced bandwidth usage.</li>
-<li><strong>Type Checking Target</strong>: The addition of a make type target provides developers with a standardized way to perform type checking across the SDK. This ensures better code quality and helps catch type-related errors early in the development process. Before this update, developers had to manually configure type checking tools, but now they can use the standardized make type command for consistent type validation across different environments.</li>
-</ul>
-<h3>🛠️ Try It Out</h3>
-<pre><code class="language-python">from langgraph_sdk import get_client
-
-# Initialize client
-client = get_client()
-
-# Search threads with specific field extraction
-# Previously returned all fields, now you can specify what you need
-threads = await client.threads.search(extract=['thread_id', 'state'])
-
-# Type checking
-# Run the new type checking target
-# In terminal: make type
-# This will validate all type annotations in the SDK</code></pre>
-    ]]></description>
-    <guid isPermaLink="false">langchain-ai/langgraph-2026-02-24</guid>
-    <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+    <guid isPermaLink="false">mindsdb/mindsdb-2026-02-25</guid>
+    <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
   </item>
   
 </channel>

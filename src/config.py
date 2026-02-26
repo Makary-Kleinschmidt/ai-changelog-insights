@@ -10,9 +10,17 @@ load_dotenv()
 
 # --- Gemini API ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-3.0-flash"
+GEMINI_MODEL = "gemini-3-flash-preview"
+GEMINI_FALLBACK_MODELS = [
+    "gemini-2.5-flash", 
+    "gemini-2.0-flash"
+]
 RATE_LIMIT_DELAY = 12  # seconds between calls (5 RPM limit)
 DAILY_LIMIT = 20       # max 20 requests per day
+MAX_RETRIES = 2        # retries per model for 503/429/504 errors
+RETRY_DELAY = 30       # seconds to wait before retry on 503
+GEMINI_TIMEOUT = 60    # seconds before timing out an API call
+MAX_OUTPUT_TOKENS = 16000  # prevent JSON truncation on complex responses
 
 GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
 

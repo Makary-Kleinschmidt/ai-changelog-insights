@@ -2,19 +2,19 @@
 
 ## 🏗️ System Overview
 
-**Daily Wiki Insights** is an autonomous content generation system designed to run on a scheduled basis (locally via Windows Task Scheduler or cloud-native via GitHub Actions). It transforms raw Wikipedia data into engaging, modern insights using LLMs.
+**AI Changelog Insights** is an autonomous content generation system that aggregates daily updates from top AI repositories (GitHub) and summarizes them using Gemini LLMs into a static dashboard.
 
 ### High-Level Flow
 
 ```mermaid
 graph LR
     A[Scheduler] -->|Trigger| B(src/main.py)
-    B -->|Fetch| C[Wikipedia API]
-    C -->|Raw Data| B
-    B -->|Transform| D[OpenRouter LLM]
-    D -->|Insight Markdown| B
-    B -->|Convert| E[Markdown to HTML]
-    E -->|Render| F[Static HTML Site]
+    B -->|Fetch Repos| C[GitHub API]
+    C -->|Changelogs & Releases| B
+    B -->|Summarize| D[Gemini API]
+    D -->|Structured JSON| B
+    B -->|Render| E[Jinja2 + Markdown → HTML]
+    E -->|Output| F[Static Site + RSS]
     F -->|Deploy| G[GitHub Pages]
 ```
 
@@ -23,11 +23,17 @@ graph LR
 ## 📂 Project Structure
 
 ```
-wikipedia-insights/
-├── .github/workflows/   # CI/CD pipelines (GitHub Actions)
+ai-changelog-insights/
+├── .github/workflows/   # CI/CD pipeline (daily-update.yml)
 ├── scripts/             # Automation scripts (PowerShell)
-├── site/                # Generated static website (HTML/CSS)
+├── site/                # Generated static website (HTML/CSS/RSS)
 ├── src/                 # Core application logic (Python)
+│   ├── config.py        # API keys, model settings, prompts
+│   ├── github_client.py # GitHub fetcher with VIP + search
+│   ├── summarizer.py    # Gemini LLM integration with fallback
+│   └── main.py          # Orchestrator & site generator
+├── tests/               # Automated flow tests
+├── logs/                # Runtime logs
 ├── .env                 # Secrets (API Keys) - NOT COMMITTED
 ├── pyproject.toml       # Dependency management (uv)
 └── README.md            # User guide
@@ -38,79 +44,73 @@ wikipedia-insights/
 ## 🧩 Core Components & Libraries
 
 ### 1. **Package Management: `uv`**
--   **Why**: Extremely fast Python package installer and resolver. Replaces `pip` and `virtualenv`.
--   **Role**: Manages the project environment and dependencies (`pyproject.toml`).
--   **Key Command**: `uv run src/main.py` (executes script in isolated env).
+-   **Why**: Extremely fast Python package installer and resolver.
+-   **Key Command**: `uv run python -m src.main` (executes in isolated env).
 
-### 2. **Content Fetcher: `src/scraper.py`**
--   **Library**: `requests`
--   **Why**: Simple, robust HTTP library for API calls.
--   **Role**: Fetches "Today's Featured Article" from the Wikimedia REST API.
--   **Data Flow**: `GET https://api.wikimedia.org/...` -> JSON Response -> Dictionary.
+### 2. **Repository Fetcher: `src/github_client.py`**
+-   **Library**: `PyGithub`, `tenacity`
+-   **Role**: Fetches changelogs/releases from VIP repositories first, then searches for active AI repos by stars.
+-   **Retry Logic**: Exponential backoff (5 attempts) for rate limits and connection errors.
+-   **Data Sources**: `CHANGELOG.md` (and variants) → direct file read; or GitHub Releases API → pseudo-changelog.
 
-### 3. **Content Transformer: `src/rewriter.py`**
--   **Library**: `requests` (calling OpenRouter API)
--   **Why**: Universal interface for LLMs (Claude, GPT, etc.).
--   **Role**: Sends raw Wikipedia text + Prompt -> LLM -> Returns "Insightful" article in **Markdown**.
--   **Customization**: Change `INSIGHT_PROMPT` in `src/config.py` to alter the writing style.
+### 3. **LLM Summarizer: `src/summarizer.py`**
+-   **Library**: `google-genai` (Gemini SDK)
+-   **Role**: Sends changelog text + structured prompt → Gemini → Returns JSON with What's New, Why Important, Try It Out (3 levels).
+-   **Model Strategy**: Primary (`gemini-3-flash-preview`) → Fallback (`gemini-2.5-flash` → `gemini-2.0-flash`).
+-   **Resilience**:
+    -   Retries on 503 (Service Unavailable), 429 (Rate Limit), and 504 (Deadline Exceeded).
+    -   Respects server-suggested `retryDelay` from error responses.
+    -   Truncated JSON repair — closes open strings/arrays/objects when response is cut off mid-generation.
+-   **Rate Limiting**: 12s sleep between calls (5 RPM free tier). Configurable via `RATE_LIMIT_DELAY`.
+-   **Customization**: Edit prompts in `src/config.py` (`CHANGELOG_UPDATE_CHECK_PROMPT`, `GLOBAL_SUMMARY_PROMPT`).
 
 ### 4. **Site Generator: `src/main.py`**
 -   **Libraries**: `jinja2`, `markdown`
--   **Why**: 
-    -   `jinja2`: Templating engine to separate logic from design.
-    -   `markdown`: Converts the rich text returned by the LLM into browser-readable HTML.
--   **Role**: 
-    1.  Orchestrates scraping and rewriting.
-    2.  Converts Markdown -> HTML.
-    3.  Renders `site/template.html`.
--   **Output**: Produces `site/index.html`.
+-   **Role**:
+    1.  Orchestrates fetching and summarization.
+    2.  Converts structured JSON → HTML cards.
+    3.  Renders `site/template.html` with Jinja2.
+    4.  Generates RSS feed (`site/feed.xml`).
+-   **Output**: `site/index.html`, `site/archives/{date}.html`, `site/feed.xml`, `site/meta.json`.
 
 ---
 
 ## 🔄 Data Flow Detail
 
-1.  **Trigger**: `scripts/run_daily.ps1` wakes up the system.
-2.  **Input**: `src/scraper.py` hits Wikipedia.
-    *   *Input*: Date (Today)
-    *   *Output*: `{ title, extract, thumbnail_url, wiki_url }`
-3.  **Processing**: `src/rewriter.py` calls OpenRouter.
-    *   *Input*: Raw extract + Prompt
-    *   *Output*: Rewritten Markdown text (300-500 words).
-4.  **Conversion**: `src/main.py` uses `markdown` library.
-    *   *Input*: Markdown string (`**bold**`, `## Heading`)
-    *   *Output*: HTML string (`<strong>bold</strong>`, `<h2>Heading</h2>`)
-5.  **Rendering**: `src/main.py` loads `site/template.html`.
-    *   *Input*: Template + HTML Content
-    *   *Output*: Final HTML file.
-6.  **Deployment**: Git commands push `site/` folder to GitHub.
+1.  **Trigger**: GitHub Actions cron (23:55 UTC) or manual `uv run python -m src.main --date YYYY-MM-DD`.
+2.  **Fetch**: `github_client.py` yields VIP repos, then searches for active AI repos.
+    -   *Input*: VIP list + GitHub search query (stars>500, pushed recently)
+    -   *Output*: `{ name, full_name, changelog, stars, ... }`
+3.  **Local Pre-check**: If `target_date` string not found in changelog text, skip LLM call entirely (cost saving).
+4.  **LLM Summarize**: `summarizer.py` calls Gemini with truncated changelog excerpt.
+    -   *Input*: Changelog text around the target date + structured prompt
+    -   *Output*: JSON `{ update_found, title, whats_new[], why_important, try_it_out{} }`
+5.  **Render**: `main.py` converts JSON to HTML, applies Jinja2 template, writes static files.
+6.  **Deploy**: GitHub Actions pushes `site/` to `gh-pages` branch.
 
 ---
 
 ## 🛠️ Making Quick Changes
 
-### "I want to change the writing style"
-*   **File**: `src/config.py`
-*   **Action**: Edit `INSIGHT_PROMPT`. You can make it funny, serious, academic, etc.
+### "I want to change the LLM output style"
+-   **File**: `src/config.py`
+-   **Action**: Edit `CHANGELOG_UPDATE_CHECK_PROMPT` or `GLOBAL_SUMMARY_PROMPT`.
 
 ### "I want to change the website look"
-*   **File**: `site/style.css`
-*   **Action**: Edit CSS.
-    *   `--primary-color`: Headlines & Accents.
-    *   `.container`: Adjust `max-width` to change page width.
-    *   `.content`: Adjust font size and line height for readability.
+-   **File**: `site/style.css`
+-   **Action**: Edit CSS variables (`--primary-color`, etc).
 
 ### "I want to change the layout structure"
-*   **File**: `site/template.html`
-*   **Action**: Edit HTML structure. Use Jinja2 tags like `{{ title }}`.
-*   **Note**: Use `{{ content | safe }}` to render the HTML properly.
+-   **File**: `site/template.html`
+-   **Action**: Edit HTML. Use `{{ content | safe }}` for rendered HTML.
 
-### "I want to run it at a different time"
-*   **File**: `scripts/setup_schedule.ps1`
-*   **Action**: Change `$Time = "09:00am"`. Run the script again to update the task.
+### "I want to add/remove VIP repos"
+-   **File**: `src/config.py`
+-   **Action**: Edit `VIP_REPOS` list.
 
 ---
 
 ## ⚠️ Key Constraints
-*   **API Limits**: Wikipedia has rate limits (handled by User-Agent). OpenRouter costs money per token.
-*   **Markdown Parsing**: The LLM must return valid Markdown. If it returns malformed text, the HTML conversion might look odd.
-*   **Image Handling**: We hotlink images from Wikimedia. If they delete the image, it breaks (handled by `{% if image %}` check).
+-   **API Limits**: GitHub rate limits handled by `GH_ACCESS_TOKEN`. Gemini free tier: 5 RPM, ~20 RPD (throttled by `RATE_LIMIT_DELAY` and `DAILY_LIMIT`).
+-   **JSON Parsing**: LLM must return valid JSON. System includes regex extraction, truncated-JSON repair, and old-format fallbacks.
+-   **Token Budget**: `MAX_OUTPUT_TOKENS=16000` to prevent truncation on complex 3-level Try It Out responses.
