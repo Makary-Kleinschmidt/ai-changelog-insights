@@ -16,25 +16,38 @@ except ImportError:
 def format_global_summary_html(data: dict) -> str:
     """
     Formats the global summary JSON into HTML.
+    Ecosystem summary is collapsed by default and parsed through markdown
+    to convert [text](url) links into clickable <a> tags.
     """
     html = []
     
-    html.append(f"<div class='global-summary-card'>")
-    html.append(f"<h2>🌍 Daily Ecosystem Report</h2>")
-    html.append(f"<p class='ecosystem-overview'>{data.get('ecosystem_summary', '')}</p>")
+    html.append("<div class='global-summary-card'>")
+    html.append("<h2>🌍 Daily Ecosystem Report</h2>")
+    
+    # Render ecosystem summary through markdown for clickable hyperlinks
+    raw_summary = data.get('ecosystem_summary', '')
+    rendered_summary = markdown.markdown(raw_summary, extensions=['extra'])
+    
+    # Wrap in collapsed <details> — user opens it if they want
+    html.append("<details class='ecosystem-details'>")
+    html.append("<summary class='ecosystem-toggle'>📖 Read Ecosystem Analysis</summary>")
+    html.append(f"<div class='ecosystem-overview'>{rendered_summary}</div>")
+    html.append("</details>")
     
     if data.get('synergies'):
-        html.append(f"<h3>🔗 Synergies & Connections</h3>")
+        html.append("<h3>🔗 Synergies & Connections</h3>")
         html.append("<ul>")
         for item in data['synergies']:
-            html.append(f"<li><strong>{item.get('title')}</strong>: {item.get('description')}</li>")
+            desc = markdown.markdown(item.get('description', ''), extensions=['extra'])
+            html.append(f"<li><strong>{item.get('title')}</strong>: {desc}</li>")
         html.append("</ul>")
         
     if data.get('potential_issues'):
-        html.append(f"<h3>⚠️ Potential Issues & Conflicts</h3>")
+        html.append("<h3>⚠️ Potential Issues & Conflicts</h3>")
         html.append("<ul>")
         for item in data['potential_issues']:
-            html.append(f"<li><strong>{item.get('title')}</strong>: {item.get('description')}</li>")
+            desc = markdown.markdown(item.get('description', ''), extensions=['extra'])
+            html.append(f"<li><strong>{item.get('title')}</strong>: {desc}</li>")
         html.append("</ul>")
         
     html.append("</div>")
@@ -43,16 +56,33 @@ def format_global_summary_html(data: dict) -> str:
 def format_summary_html(data: dict) -> str:
     """
     Converts the JSON summary data into the HTML format expected by the template.
+    Uses new schema: whats_new (list), why_important (str), try_it_out (3 levels).
     """
     html = []
     
-    # What's New
-    html.append(f"<h3>🚀 What's New</h3>")
-    html.append(f"<p>{data.get('summary', '')}</p>")
+    # What's New — bullet point list of facts
+    html.append("<h3>🚀 What's New</h3>")
+    whats_new = data.get('whats_new', [])
+    if whats_new and isinstance(whats_new, list):
+        html.append("<ul>")
+        for item in whats_new:
+            html.append(f"<li>{item}</li>")
+        html.append("</ul>")
+    else:
+        # Fallback for old-format responses that still use 'summary'
+        summary = data.get('summary', '')
+        if summary:
+            html.append(f"<p>{summary}</p>")
     
-    # Why It Matters
-    if data.get('impact'):
-        html.append(f"<h3>💡 Why It Matters</h3>")
+    # Why It's Important — context paragraph
+    why_important = data.get('why_important', '')
+    if why_important:
+        html.append("<h3>💡 Why It's Important</h3>")
+        rendered_why = markdown.markdown(why_important, extensions=['extra'])
+        html.append(rendered_why)
+    elif data.get('impact'):
+        # Fallback for old-format responses
+        html.append("<h3>💡 Why It's Important</h3>")
         html.append("<ul>")
         for item in data['impact']:
             name = item.get('name', 'Feature')
@@ -60,21 +90,36 @@ def format_summary_html(data: dict) -> str:
             html.append(f"<li><strong>{name}</strong>: {desc}</li>")
         html.append("</ul>")
         
-    # Try It Out
+    # Try It Out — 3 collapsed levels
     if data.get('try_it_out'):
         tio = data['try_it_out']
         lang = tio.get('language', '')
-        code = tio.get('code', '')
-        if code:
-            html.append(f"<h3>🛠️ Try It Out</h3>")
-            # Using pre/code block. 
-            # Note: We are manually building HTML, so we need to escape generic content if we were paranoid,
-            # but usually LLM output is controlled. 
-            # Ideally use markdown for code to get highlighting if we process it later, 
-            # but here we are constructing final HTML.
-            # Let's wrap in markdown code block and use markdown lib to render it to ensure syntax highlighting works?
-            # Or just raw <pre><code>. The existing CSS targets pre/code.
-            html.append(f"<pre><code class=\"language-{lang}\">{code}</code></pre>")
+        
+        levels = ['beginner', 'intermediate', 'advanced']
+        level_icons = {'beginner': '🟢', 'intermediate': '🟡', 'advanced': '🔴'}
+        
+        has_levels = any(isinstance(tio.get(lvl), dict) for lvl in levels)
+        
+        if has_levels:
+            html.append("<h3>🛠️ Try It Out</h3>")
+            for lvl in levels:
+                lvl_data = tio.get(lvl)
+                if not isinstance(lvl_data, dict):
+                    continue
+                label = lvl_data.get('label', lvl.capitalize())
+                code = lvl_data.get('code', '')
+                icon = level_icons.get(lvl, '⚪')
+                if code:
+                    html.append(f"<details class='try-it-level'>")
+                    html.append(f"<summary>{icon} {label}</summary>")
+                    html.append(f"<pre><code class=\"language-{lang}\">{code}</code></pre>")
+                    html.append("</details>")
+        else:
+            # Fallback: single code block (old format)
+            code = tio.get('code', '')
+            if code:
+                html.append("<h3>🛠️ Try It Out</h3>")
+                html.append(f"<pre><code class=\"language-{lang}\">{code}</code></pre>")
             
     return "\n".join(html)
 

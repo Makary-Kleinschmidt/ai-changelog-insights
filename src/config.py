@@ -3,9 +3,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-REWRITE_MODEL = "deepseek/deepseek-v3.2"
+# --- OpenRouter (commented out, kept for rollback) ---
+# OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+# OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+# REWRITE_MODEL = "deepseek/deepseek-v3.2"
+
+# --- Gemini API ---
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = "gemini-3.0-flash"
+RATE_LIMIT_DELAY = 12  # seconds between calls (5 RPM limit)
+DAILY_LIMIT = 20       # max 20 requests per day
+
 GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
 
 # VIP Repositories to always check
@@ -65,39 +73,50 @@ Instructions:
     -   If NO: Output ONLY the JSON: `{{"update_found": false}}`.
     -   If YES: Extract the update details and format as JSON.
 
-2.  **Analyze for User Utility (CRITICAL)**:
-    -   Users want to know **strictly what to do** with the update.
-    -   Avoid abstract descriptions like "Improved performance" or "Fixed bugs". Be specific: "Fixed memory leak in vector search".
-    -   **What's New**: A detailed technical summary.
-    -   **Why It Matters**: Explain the practical benefit IN DEPTH. This section should be detailed and comprehensive (at least 3-4 sentences per item).
-        -   Provide context on the problem being solved.
-        -   Compare "before" vs "after" scenarios.
-        -   Explain *why* this is important for the user's workflow or application.
-        -   Example: Instead of just "Faster queries", say "Previously, vector search on large datasets could take seconds. This update introduces a new indexing algorithm that reduces latency by 50% for RAG pipelines, making real-time applications viable."
-    -   **Try It Out**: THIS IS THE MOST IMPORTANT SECTION. Provide a **valid, copy-pasteable code snippet** or CLI command that demonstrates the new feature.
-        -   If it's a library (Python/JS), show a code example using the new API.
-        -   If it's a tool, show the command line usage.
-        -   If it's a bug fix, show the code that used to break and now works (or just the corrected usage).
-        -   **Do not use placeholders** like `your_code_here` unless absolutely necessary. Make it a working example.
+2.  **What's New (whats_new)**: A list of factual bullet points describing WHAT changed.
+    -   Each item should be a single, specific fact (e.g., "Added streaming support for tool calls in the Chat API").
+    -   Be specific and technical. No vague statements.
+    -   NEVER mention whether an update is "nightly", "daily", "weekly", or what those terms mean.
+    -   NEVER describe release cadence or timing. Focus ONLY on the technical changes themselves.
+
+3.  **Why It's Important (why_important)**: A paragraph providing context and significance.
+    -   Explain the practical benefit IN DEPTH (at least 3-4 sentences).
+    -   Provide context on the problem being solved.
+    -   Compare "before" vs "after" scenarios.
+    -   Explain why this matters for the user's workflow or application.
+    -   Example: "Previously, vector search on large datasets could take seconds. This update introduces a new indexing algorithm that reduces latency by 50% for RAG pipelines, making real-time applications viable."
+
+4.  **Try It Out (try_it_out)**: Provide 3 levels of implementation examples.
+    -   Each level should have a short descriptive label and valid, copy-pasteable code.
+    -   **beginner**: The simplest possible usage. Install + hello world.
+    -   **intermediate**: A realistic use case with configuration or parameters.
+    -   **advanced**: Production-ready pattern with error handling, best practices, or integration.
+    -   Do not use placeholders like `your_code_here`. Make them working examples.
 
 Output Format (JSON):
 {{
   "update_found": true,
   "title": "Release Title/Version",
-  "summary": "Technical summary of changes...",
-  "impact": [
-    {{
-      "name": "Feature/Change Name",
-      "description": "Specific, practical benefit..."
-    }},
-    {{
-      "name": "Another Feature",
-      "description": "..."
-    }}
+  "whats_new": [
+    "Added streaming support for tool calls",
+    "Fixed memory leak in batch processing",
+    "Deprecated old v1 embedding endpoint"
   ],
+  "why_important": "Detailed paragraph explaining significance and context...",
   "try_it_out": {{
     "language": "python",
-    "code": "from library import new_feature\\n\\n# Real usage example\\nresult = new_feature.run(param='value')\\nprint(result)"
+    "beginner": {{
+      "label": "Quick Start",
+      "code": "pip install library\\nfrom library import feature\\nresult = feature.run()\\nprint(result)"
+    }},
+    "intermediate": {{
+      "label": "With Configuration",
+      "code": "from library import feature\\n\\nclient = feature.Client(timeout=30)\\nresult = client.run(param='value', stream=True)\\nfor chunk in result:\\n    print(chunk)"
+    }},
+    "advanced": {{
+      "label": "Production Setup",
+      "code": "import asyncio\\nfrom library import feature\\n\\nasync def main():\\n    client = feature.AsyncClient(\\n        timeout=30,\\n        retries=3\\n    )\\n    try:\\n        result = await client.run(param='value')\\n        print(result)\\n    except Exception as e:\\n        logging.error(f'Failed: {{e}}')\\n\\nasyncio.run(main())"
+    }}
   }}
 }}
 """
@@ -110,12 +129,19 @@ Updates for today:
 
 Instructions:
 1.  **Analyze Synergies**: Look for connections between updates.
-    -   Did multiple libraries add support for the same model (e.g., Llama 3)?
-    -   Are there complementary features (e.g., LangChain adds a tool that AutoGPT can use)?
+    -   Did multiple libraries add support for the same model?
+    -   Are there complementary features?
 2.  **Identify Potential Issues**:
-    -   Are there breaking changes in a core library (like `transformers`) that might affect dependent libraries (like `langchain` or `llama_index`)?
+    -   Are there breaking changes in a core library that might affect dependent libraries?
     -   Are there conflicting dependency requirements?
-3.  **Synthesize**: Create a high-level summary of the day's AI ecosystem.
+3.  **Write the Ecosystem Summary (CRITICAL)**:
+    -   Write a CONTINUOUS, PROGRESSIVE summary — do NOT use section headers or level labels.
+    -   Structure it as multiple paragraphs that naturally flow from simple to complex:
+        - Start with foundational context anyone can understand (what happened today, which tools updated).
+        - In the middle paragraphs, explain the technical connections and synergies between updates.
+        - End with advanced analysis: architectural implications, potential breaking changes, migration strategies.
+    -   Each paragraph should build on the previous one. A reader starts with beginner info and ends with advanced insights.
+    -   Use Markdown links for any URLs: [display text](https://url). This is important for rendering.
 
 Output Format (JSON):
 {{
@@ -134,3 +160,4 @@ Output Format (JSON):
   "ecosystem_summary": "Today's updates focus heavily on agentic workflows..."
 }}
 """
+
