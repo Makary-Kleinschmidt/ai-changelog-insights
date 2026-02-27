@@ -221,8 +221,30 @@
     </header>
     
     <main>
-        {% if global_summary %}
-            {{ global_summary }}
+        {% if global_summary_data %}
+            <div class='global-summary-card'>
+                <h2>🌍 Daily Ecosystem Report</h2>
+                <details class='ecosystem-details'>
+                    <summary class='ecosystem-toggle'>📖 Read Ecosystem Analysis</summary>
+                    <div class='ecosystem-overview'>{{ global_summary_data.ecosystem_summary | markdown | safe }}</div>
+                </details>
+                {% if global_summary_data.synergies %}
+                    <h3>🔗 Synergies & Connections</h3>
+                    <ul>
+                    {% for item in global_summary_data.synergies %}
+                        <li><strong>{{ item.title }}</strong>: {{ item.description | markdown | safe }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if global_summary_data.potential_issues %}
+                    <h3>⚠️ Potential Issues & Conflicts</h3>
+                    <ul>
+                    {% for item in global_summary_data.potential_issues %}
+                        <li><strong>{{ item.title }}</strong>: {{ item.description | markdown | safe }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
         {% endif %}
         {% if repos %}
             {% for repo in repos %}
@@ -235,7 +257,30 @@
                 </div>
                 <p class="repo-description">{{repo.description}}</p>
                 <div class="changelog-summary">
-                    {{repo.summary_html}}
+                    <h3>🚀 What's New</h3>
+                    <ul>
+                    {% for item in repo.summary_data.whats_new %}
+                        <li>{{ item }}</li>
+                    {% endfor %}
+                    </ul>
+                    
+                    {% if repo.summary_data.why_important %}
+                        <h3>💡 Why It's Important</h3>
+                        {{ repo.summary_data.why_important | markdown | safe }}
+                    {% endif %}
+                    
+                    {% if repo.summary_data.try_it_out %}
+                        <h3>🛠️ Try It Out</h3>
+                        {% set lang = repo.summary_data.try_it_out.language %}
+                        {% for level, icon in [('beginner', '🟢'), ('intermediate', '🟡'), ('advanced', '🔴')] %}
+                            {% if repo.summary_data.try_it_out[level] and repo.summary_data.try_it_out[level].code %}
+                                <details class='try-it-level'>
+                                    <summary>{{ icon }} {{ repo.summary_data.try_it_out[level].label }}</summary>
+                                    <pre><code class="language-{{ lang }}">{{ repo.summary_data.try_it_out[level].code }}</code></pre>
+                                </details>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </article>
             {% endfor %}

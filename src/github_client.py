@@ -138,7 +138,7 @@ def get_changelog_content(repo) -> Optional[str]:
                 if content_file.size > 1000000:
                     continue
                 return base64.b64decode(content_file.content).decode("utf-8")
-            except:
+            except Exception:
                 continue
             
     return None
@@ -159,5 +159,5 @@ def get_releases_content(repo) -> Optional[str]:
             pseudo_changelog += f"{release.body}\n\n"
             
         return pseudo_changelog
-    except:
+    except Exception:
         return None

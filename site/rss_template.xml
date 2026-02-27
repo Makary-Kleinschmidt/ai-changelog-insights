@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>AI Changelog Insights</title>
+  <link>https://ai-changelog-insights.github.io</link>
+  <description>Daily AI updates, summarized for developers.</description>
+  <atom:link href="https://ai-changelog-insights.github.io/feed.xml" rel="self" type="application/rss+xml" />
+  <language>en-us</language>
+  <lastBuildDate>{{ build_date }}</lastBuildDate>
+  {% for repo in repos %}
+  <item>
+    <title>{{ repo.name }} - {{ repo.title }}</title>
+    <link>{{ repo.url }}</link>
+    <description><![CDATA[
+      <h3>🚀 What's New</h3>
+      <ul>
+      {% for item in repo.summary_data.whats_new %}
+        <li>{{ item }}</li>
+      {% endfor %}
+      </ul>
+      {% if repo.summary_data.why_important %}
+        <h3>💡 Why It's Important</h3>
+        {{ repo.summary_data.why_important | markdown | safe }}
+      {% endif %}
+    ]]></description>
+    <guid isPermaLink="false">{{ repo.full_name }}-{{ repo.update_date }}</guid>
+    <pubDate>{{ repo.pub_date }}</pubDate>
+  </item>
+  {% endfor %}
+</channel>
+</rss>

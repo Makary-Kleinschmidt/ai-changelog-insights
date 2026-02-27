@@ -65,12 +65,12 @@ ai-changelog-insights/
 -   **Customization**: Edit prompts in `src/config.py` (`CHANGELOG_UPDATE_CHECK_PROMPT`, `GLOBAL_SUMMARY_PROMPT`).
 
 ### 4. **Site Generator: `src/main.py`**
--   **Libraries**: `jinja2`, `markdown`
+-   **Libraries**: `jinja2`, `markdown`, `pathlib`
 -   **Role**:
     1.  Orchestrates fetching and summarization.
     2.  Converts structured JSON → HTML cards.
     3.  Renders `site/template.html` with Jinja2.
-    4.  Generates RSS feed (`site/feed.xml`).
+    4.  Generates RSS feed using an external template (`site/rss_template.xml`).
 -   **Output**: `site/index.html`, `site/archives/{date}.html`, `site/feed.xml`, `site/meta.json`.
 
 ---

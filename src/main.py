@@ -2,153 +2,22 @@ import os
 import json
 import time
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 from jinja2 import Template
 import markdown
 import argparse
 
-try:
-    from github_client import yield_active_ai_repos
-    from summarizer import check_for_daily_update, generate_global_summary
-except ImportError:
-    from src.github_client import yield_active_ai_repos
-    from src.summarizer import check_for_daily_update, generate_global_summary
+from src.github_client import yield_active_ai_repos
+from src.summarizer import check_for_daily_update, generate_global_summary
 
-def format_global_summary_html(data: dict) -> str:
-    """
-    Formats the global summary JSON into HTML.
-    Ecosystem summary is collapsed by default and parsed through markdown
-    to convert [text](url) links into clickable <a> tags.
-    """
-    html = []
-    
-    html.append("<div class='global-summary-card'>")
-    html.append("<h2>🌍 Daily Ecosystem Report</h2>")
-    
-    # Render ecosystem summary through markdown for clickable hyperlinks
-    raw_summary = data.get('ecosystem_summary', '')
-    rendered_summary = markdown.markdown(raw_summary, extensions=['extra'])
-    
-    # Wrap in collapsed <details> — user opens it if they want
-    html.append("<details class='ecosystem-details'>")
-    html.append("<summary class='ecosystem-toggle'>📖 Read Ecosystem Analysis</summary>")
-    html.append(f"<div class='ecosystem-overview'>{rendered_summary}</div>")
-    html.append("</details>")
-    
-    if data.get('synergies'):
-        html.append("<h3>🔗 Synergies & Connections</h3>")
-        html.append("<ul>")
-        for item in data['synergies']:
-            desc = markdown.markdown(item.get('description', ''), extensions=['extra'])
-            html.append(f"<li><strong>{item.get('title')}</strong>: {desc}</li>")
-        html.append("</ul>")
-        
-    if data.get('potential_issues'):
-        html.append("<h3>⚠️ Potential Issues & Conflicts</h3>")
-        html.append("<ul>")
-        for item in data['potential_issues']:
-            desc = markdown.markdown(item.get('description', ''), extensions=['extra'])
-            html.append(f"<li><strong>{item.get('title')}</strong>: {desc}</li>")
-        html.append("</ul>")
-        
-    html.append("</div>")
-    return "\n".join(html)
-
-def format_summary_html(data: dict) -> str:
-    """
-    Converts the JSON summary data into the HTML format expected by the template.
-    Uses new schema: whats_new (list), why_important (str), try_it_out (3 levels).
-    """
-    html = []
-    
-    # What's New — bullet point list of facts
-    html.append("<h3>🚀 What's New</h3>")
-    whats_new = data.get('whats_new', [])
-    if whats_new and isinstance(whats_new, list):
-        html.append("<ul>")
-        for item in whats_new:
-            html.append(f"<li>{item}</li>")
-        html.append("</ul>")
-    else:
-        # Fallback for old-format responses that still use 'summary'
-        summary = data.get('summary', '')
-        if summary:
-            html.append(f"<p>{summary}</p>")
-    
-    # Why It's Important — context paragraph
-    why_important = data.get('why_important', '')
-    if why_important:
-        html.append("<h3>💡 Why It's Important</h3>")
-        rendered_why = markdown.markdown(why_important, extensions=['extra'])
-        html.append(rendered_why)
-    elif data.get('impact'):
-        # Fallback for old-format responses
-        html.append("<h3>💡 Why It's Important</h3>")
-        html.append("<ul>")
-        for item in data['impact']:
-            name = item.get('name', 'Feature')
-            desc = item.get('description', '')
-            html.append(f"<li><strong>{name}</strong>: {desc}</li>")
-        html.append("</ul>")
-        
-    # Try It Out — 3 collapsed levels
-    if data.get('try_it_out'):
-        tio = data['try_it_out']
-        lang = tio.get('language', '')
-        
-        levels = ['beginner', 'intermediate', 'advanced']
-        level_icons = {'beginner': '🟢', 'intermediate': '🟡', 'advanced': '🔴'}
-        
-        has_levels = any(isinstance(tio.get(lvl), dict) for lvl in levels)
-        
-        if has_levels:
-            html.append("<h3>🛠️ Try It Out</h3>")
-            for lvl in levels:
-                lvl_data = tio.get(lvl)
-                if not isinstance(lvl_data, dict):
-                    continue
-                label = lvl_data.get('label', lvl.capitalize())
-                code = lvl_data.get('code', '')
-                icon = level_icons.get(lvl, '⚪')
-                if code:
-                    html.append(f"<details class='try-it-level'>")
-                    html.append(f"<summary>{icon} {label}</summary>")
-                    html.append(f"<pre><code class=\"language-{lang}\">{code}</code></pre>")
-                    html.append("</details>")
-        else:
-            # Fallback: single code block (old format)
-            code = tio.get('code', '')
-            if code:
-                html.append("<h3>🛠️ Try It Out</h3>")
-                html.append(f"<pre><code class=\"language-{lang}\">{code}</code></pre>")
-            
-    return "\n".join(html)
-
-def generate_rss_feed(repos, target_date_str):
+def generate_rss_feed(repos, target_date_str, base_dir: Path):
     """Generates an RSS feed for the updates."""
-    rss_template = """<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-<channel>
-  <title>AI Changelog Insights</title>
-  <link>https://ai-changelog-insights.github.io</link>
-  <description>Daily AI updates, summarized for developers.</description>
-  <atom:link href="https://ai-changelog-insights.github.io/feed.xml" rel="self" type="application/rss+xml" />
-  <language>en-us</language>
-  <lastBuildDate>{{ build_date }}</lastBuildDate>
-  {% for repo in repos %}
-  <item>
-    <title>{{ repo.name }} - {{ repo.title }}</title>
-    <link>{{ repo.url }}</link>
-    <description><![CDATA[
-      {{ repo.summary_html }}
-    ]]></description>
-    <guid isPermaLink="false">{{ repo.full_name }}-{{ repo.update_date }}</guid>
-    <pubDate>{{ repo.pub_date }}</pubDate>
-  </item>
-  {% endfor %}
-</channel>
-</rss>
-"""
+    template_path = base_dir / "site" / "rss_template.xml"
+    with open(template_path, "r", encoding="utf-8") as f:
+        rss_template = f.read()
+
     t = Template(rss_template)
+    t.globals['markdown'] = lambda text: markdown.markdown(text, extensions=['extra']) if text else ''
     return t.render(
         repos=repos,
         build_date=datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -160,9 +29,16 @@ def generate_site(target_date_str: str = None, force: bool = False):
         
     print(f"🚀 Starting Real-Time AI Changelog Aggregation for {target_date_str}...")
     
+    BASE_DIR = Path(__file__).parent.parent
+    site_dir = BASE_DIR / "site"
+    site_dir.mkdir(exist_ok=True)
+    
     # Check if already generated
-    archive_path = f"site/archives/{target_date_str}.html"
-    if os.path.exists(archive_path) and not force:
+    archive_dir = site_dir / "archives"
+    archive_dir.mkdir(exist_ok=True)
+    archive_path = archive_dir / f"{target_date_str}.html"
+    
+    if archive_path.exists() and not force:
         print(f"✨ Site for {target_date_str} is already up to date. Skipping generation.")
         print("💡 Use --force to regenerate.")
         return
@@ -214,9 +90,6 @@ def generate_site(target_date_str: str = None, force: bool = False):
         if summary_data:
             print(f"  ✅ FOUND UPDATE for {found_date}!")
             
-            # Convert JSON to HTML
-            summary_html = format_summary_html(summary_data)
-            
             # Prepare repo object
             repo_entry = {
                 "name": repo_data['name'],
@@ -224,7 +97,7 @@ def generate_site(target_date_str: str = None, force: bool = False):
                 "description": repo_data['description'],
                 "url": repo_data['url'],
                 "stars": repo_data['stars'],
-                "summary_html": summary_html,
+                "summary_data": summary_data,
                 "update_date": found_date,
                 "is_fresh": is_fresh,
                 "title": summary_data.get('title', 'Update'),
@@ -260,49 +133,49 @@ def generate_site(target_date_str: str = None, force: bool = False):
         final_repos.extend(secondary_list[:needed])
 
     # 2. Generate Global Summary
-    # Only generate if we have at least one update
-    global_summary_html = ""
+    global_summary_data = None
     if final_repos:
         print(f"🎨 Generating dashboard with {len(final_repos)} updates...")
         print("🧠 Generating global ecosystem analysis...")
         global_summary_data = generate_global_summary(final_repos)
-        if global_summary_data:
-             global_summary_html = format_global_summary_html(global_summary_data)
     else:
         print("⚠️ No updates found at all (Fresh or Recent). Skipping global summary.")
 
     try:
-        with open("site/template.html", "r", encoding="utf-8") as f:
+        template_file = site_dir / "template.html"
+        with open(template_file, "r", encoding="utf-8") as f:
             template_content = f.read()
             template = Template(template_content)
+            template.globals['markdown'] = lambda text: markdown.markdown(text, extensions=['extra']) if text else ''
             
         html = template.render(
             title="AI Changelog Insights",
             date=target_date_str,
             repos=final_repos,
-            global_summary=global_summary_html,
+            global_summary_data=global_summary_data,
             generated_at=datetime.now(timezone.utc).strftime("%H:%M UTC")
         )
         
         # Write Main Index
-        with open("site/index.html", "w", encoding="utf-8") as f:
+        index_file = site_dir / "index.html"
+        with open(index_file, "w", encoding="utf-8") as f:
             f.write(html)
             
         # Write Archive
-        os.makedirs("site/archives", exist_ok=True)
-        archive_path = f"site/archives/{target_date_str}.html"
         with open(archive_path, "w", encoding="utf-8") as f:
             f.write(html)
         print(f"📦 Archived to {archive_path}")
         
         # Write RSS Feed
-        rss_xml = generate_rss_feed(final_repos, target_date_str)
-        with open("site/feed.xml", "w", encoding="utf-8") as f:
+        rss_xml = generate_rss_feed(final_repos, target_date_str, BASE_DIR)
+        rss_file = site_dir / "feed.xml"
+        with open(rss_file, "w", encoding="utf-8") as f:
             f.write(rss_xml)
         print("📡 RSS Feed generated.")
             
         # 3. Save metadata
-        with open("site/meta.json", "w", encoding="utf-8") as f:
+        meta_file = site_dir / "meta.json"
+        with open(meta_file, "w", encoding="utf-8") as f:
             json.dump({
                 "last_updated": datetime.now(timezone.utc).isoformat(),
                 "target_date": target_date_str,
