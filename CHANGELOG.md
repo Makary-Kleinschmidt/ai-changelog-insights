@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2026-02-27
+
+### Changed
+- **Model Hierarchy**: Restored `gemini-3-flash-preview` as the primary model and `gemini-2.5-flash` as the first fallback, following user preference for higher quality models.
+- **Fallback Logic**: Configured fallback chain to strictly follow quality tiering: 3.0 -> 2.5 -> 2.0 -> 1.5, ensuring lower-tier models are only used when higher tiers are genuinely exhausted.
+
 ## [1.2.2] - 2026-02-27
 
 ### Fixed
