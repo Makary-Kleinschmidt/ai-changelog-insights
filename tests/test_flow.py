@@ -47,13 +47,26 @@ class TestFlow(unittest.TestCase):
         mock_yield_repos.return_value = iter([repo1, repo2])
         
         # First repo has update, second doesn't
-        mock_check_update.side_effect = ["Summary for repo1", "NO_UPDATE"]
+        mock_check_update.side_effect = [
+            {
+                "whats_new": ["Feature 1", "Feature 2"],
+                "why_important": "It is important.",
+                "try_it_out": {
+                    "language": "python",
+                    "beginner": {"code": "print('hello')"},
+                    "intermediate": {"code": "def hello(): pass"},
+                    "advanced": {"code": "class Hello: pass"}
+                }
+            }, 
+            None,
+            None
+        ]
         
         # Run function
         generate_site(target_date_str="2024-01-01")
         
         # Verify check_update called twice
-        self.assertEqual(mock_check_update.call_count, 2)
+        self.assertEqual(mock_check_update.call_count, 3)
         
         # Verify result was written to json
         # mock_json_dump.call_args[0][0] is the data dict
