@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2026-02-27
+
+### Fixed
+- **Empty Content Fallback**: Updated `GEMINI_FALLBACK_MODELS` in `config.py` to include a robust list of valid models (`gemini-2.0-flash`, `gemini-2.0-flash-lite-preview-02-05`, `gemini-1.5-flash`, `gemini-1.5-flash-8b`, `gemini-1.5-pro`) to prevent empty content generation when primary model quota is exhausted.
+- **Model Configuration**: Removed invalid/deprecated model names (`gemini-2.5-flash`, `gemini-3-flash-preview`) from fallback list to avoid unnecessary API errors.
+
 ## [1.2.1] - 2026-02-27
 
 ### Fixed

@@ -252,7 +252,7 @@ def generate_site(target_date_str: str = None, force: bool = False):
             
     # Combine lists
     # Prioritize fresh updates
-    final_repos = primary_list
+    final_repos = primary_list.copy()
     
     if len(final_repos) < MAX_REPOS:
         needed = MAX_REPOS - len(final_repos)
@@ -260,18 +260,21 @@ def generate_site(target_date_str: str = None, force: bool = False):
         final_repos.extend(secondary_list[:needed])
 
     # 2. Generate Global Summary
-    print(f"🎨 Generating dashboard with {len(final_repos)} updates...")
-    
+    # Only generate if we have at least one update
     global_summary_html = ""
     if final_repos:
+        print(f"🎨 Generating dashboard with {len(final_repos)} updates...")
         print("🧠 Generating global ecosystem analysis...")
         global_summary_data = generate_global_summary(final_repos)
         if global_summary_data:
              global_summary_html = format_global_summary_html(global_summary_data)
-    
+    else:
+        print("⚠️ No updates found at all (Fresh or Recent). Skipping global summary.")
+
     try:
         with open("site/template.html", "r", encoding="utf-8") as f:
-            template = Template(f.read())
+            template_content = f.read()
+            template = Template(template_content)
             
         html = template.render(
             title="AI Changelog Insights",
