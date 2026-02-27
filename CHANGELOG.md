@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2026-02-27
+
+### Changed
+- **Rate Limit Intelligence**: Implemented session-level model exhaustion tracking. If a model fails with a 429 error repeatedly, it is marked as "Exhausted" (Daily Limit hit) and skipped for all subsequent repositories in the current run, preventing wasteful API calls and delays.
+- **Retry Logic**: Improved distinction between transient errors (503/504) and rate limits (429). 429 errors now trigger specific retry warnings and lead to model blacklisting if persistent.
+
 ## [1.2.3] - 2026-02-27
 
 ### Changed

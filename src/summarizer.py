@@ -206,6 +206,10 @@ def _parse_json_response(text: str) -> dict | None:
     return None
 
 
+
+# Track exhausted models globally for the session
+_exhausted_models = set()
+
 def _call_gemini_with_fallback(prompt, system_instruction, temperature=0.2, max_tokens=None):
     """
     Calls Gemini API with model fallback and retries on transient errors (503/429/504).
@@ -224,7 +228,18 @@ def _call_gemini_with_fallback(prompt, system_instruction, temperature=0.2, max_
     fallbacks = getattr(config, 'GEMINI_FALLBACK_MODELS', [])
     models = [primary] + [m for m in fallbacks if m != primary]
     
+    # Filter out models known to be exhausted in this session
+    models = [m for m in models if m not in _exhausted_models]
+    
+    if not models:
+        print("❌ All configured models are exhausted or unavailable.")
+        return None
+    
     for model_name in models:
+        # Double check in case it was added during another thread/process (unlikely here but good practice)
+        if model_name in _exhausted_models:
+            continue
+            
         for attempt in range(config.MAX_RETRIES + 1):
             try:
                 print(f"  🤖 Calling {model_name} (Attempt {attempt + 1})...", flush=True)
@@ -256,6 +271,7 @@ def _call_gemini_with_fallback(prompt, system_instruction, temperature=0.2, max_
                     "429", "resource_exhausted",
                     "504", "deadline_exceeded"
                 ])
+                
                 if is_retryable:
                     if attempt < config.MAX_RETRIES:
                         # Try to extract server-suggested retry delay
@@ -265,10 +281,24 @@ def _call_gemini_with_fallback(prompt, system_instruction, temperature=0.2, max_
                         if delay_match:
                             suggested = int(delay_match.group(1))
                             wait_time = max(wait_time, suggested + 2)
-                        print(f"  ⚠️ Transient error ({e}). Retrying in {wait_time}s...")
+                        
+                        # 429 Specific Handling: If it's a 429, it might be RPM or Daily Limit.
+                        # We wait and retry. If it fails repeatedly, we'll catch it after the loop.
+                        if "429" in err_msg or "resource_exhausted" in err_msg:
+                            print(f"  ⚠️ Rate Limit/Quota (429) on {model_name}. Retrying in {wait_time}s...")
+                        else:
+                            print(f"  ⚠️ Transient error ({e}). Retrying in {wait_time}s...")
+                            
                         time.sleep(wait_time)
                         continue
                     else:
+                        # Retries exhausted.
+                        # If the last error was a 429, assume it's a Daily Limit (RPD) or persistent overload.
+                        # Mark as exhausted for the session so we don't waste time on it again.
+                        if "429" in err_msg or "resource_exhausted" in err_msg:
+                            print(f"  🚫 {model_name} seems to have hit DAILY LIMIT (or persistent 429). Marking as exhausted.")
+                            _exhausted_models.add(model_name)
+                        
                         print(f"  ❌ Max retries reached for {model_name}. Trying next model...")
                 else:
                     # For other errors (like 404 or prompt blocking), try next model immediately
