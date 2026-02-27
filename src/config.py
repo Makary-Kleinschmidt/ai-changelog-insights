@@ -10,10 +10,11 @@ load_dotenv()
 
 # --- Gemini API ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-3-flash-preview"
+GEMINI_MODEL = "gemini-2.0-flash"
 GEMINI_FALLBACK_MODELS = [
-    "gemini-2.5-flash", 
-    "gemini-2.0-flash"
+    "gemini-2.0-flash",
+    "gemini-2.5-flash",
+    "gemini-3-flash-preview"
 ]
 RATE_LIMIT_DELAY = 12  # seconds between calls (5 RPM limit)
 DAILY_LIMIT = 20       # max 20 requests per day

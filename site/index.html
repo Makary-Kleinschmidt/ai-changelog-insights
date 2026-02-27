@@ -49,10 +49,20 @@
                     button.addEventListener('click', async (e) => {
                         e.stopPropagation(); // Prevent accordion from toggling if button is clicked
                         
+                        let textToCopy;
                         const code = pre.querySelector('code');
-                        const text = code ? code.innerText : pre.innerText;
-                        // Remove the button text itself if it was somehow included (unlikely with querySelector('code') but possible with innerText on pre)
-                        const textToCopy = text.replace('Copy', '').replace('Copied!', '').replace('Error', '').trim();
+                        
+                        if (code) {
+                            textToCopy = code.textContent;
+                        } else {
+                            // Fallback: clone pre, remove button, get text
+                            const clone = pre.cloneNode(true);
+                            const btn = clone.querySelector('.copy-btn');
+                            if (btn) btn.remove();
+                            textToCopy = clone.textContent;
+                        }
+                        
+                        textToCopy = textToCopy.trim();
 
                         try {
                             if (navigator.clipboard && window.isSecureContext) {
@@ -116,14 +126,13 @@
                 const newContainer = document.createDocumentFragment();
                 let currentSection = null;
                 let currentContent = null;
+                let currentInnerWrapper = null;
                 let hasSections = false;
 
                 // Check if we have any h3s to determine if we should apply accordion structure
                 const hasH3 = children.some(child => child.tagName === 'H3');
 
                 if (!hasH3) {
-                    // If no sections defined, leave as is (or wrap in one open section?)
-                    // For now, let's leave it alone if no structure detected.
                     return;
                 }
 
@@ -131,6 +140,7 @@
                     if (child.tagName === 'H3') {
                         // Close previous section
                         if (currentSection && currentContent) {
+                            currentContent.appendChild(currentInnerWrapper);
                             currentSection.appendChild(currentContent);
                             newContainer.appendChild(currentSection);
                         }
@@ -142,12 +152,6 @@
                         const header = document.createElement('button');
                         header.className = 'accordion-header';
                         header.setAttribute('aria-expanded', 'false');
-                        
-                        // Move H3 inside button or keep as H3?
-                        // Better accessibility: Button containing the H3 content
-                        // But we want to keep semantic H3. 
-                        // Let's make the button wrap the H3 or put H3 inside.
-                        // CSS expects .accordion-header h3
                         
                         const h3 = child.cloneNode(true);
                         header.appendChild(h3);
@@ -171,20 +175,25 @@
 
                         currentContent = document.createElement('div');
                         currentContent.className = 'accordion-content';
+                        
+                        // Create inner wrapper for ResizeObserver
+                        currentInnerWrapper = document.createElement('div');
+                        currentInnerWrapper.className = 'accordion-inner';
+                        
+                        // Observe size changes
+                        const observer = new ResizeObserver(() => {
+                            if (currentContent.classList.contains('expanded')) {
+                                currentContent.style.maxHeight = currentContent.scrollHeight + "px";
+                            }
+                        });
+                        observer.observe(currentInnerWrapper);
+                        
                         hasSections = true;
                     } else {
-                        if (currentContent) {
-                            currentContent.appendChild(child.cloneNode(true));
+                        if (currentInnerWrapper) {
+                            currentInnerWrapper.appendChild(child.cloneNode(true));
                         } else {
-                            // Content before first H3, or if no H3s found yet.
-                            // If we are strictly following "What's New" etc., there should be an H3 first.
-                            // If not, maybe create a default section or append to fragment?
-                            // Let's append to a default "Overview" section if we want, or just pre-text.
-                            // Given the prompt, likely strict structure.
-                            // Let's create a "General" section if content exists before first H3?
-                            // Or just leave it outside.
                             if (!currentSection) {
-                                // Create a pre-content div
                                 const preDiv = document.createElement('div');
                                 preDiv.appendChild(child.cloneNode(true));
                                 newContainer.appendChild(preDiv);
@@ -195,6 +204,7 @@
 
                 // Append final section
                 if (currentSection && currentContent) {
+                    currentContent.appendChild(currentInnerWrapper);
                     currentSection.appendChild(currentContent);
                     newContainer.appendChild(currentSection);
                 }
@@ -202,6 +212,8 @@
                 if (hasSections) {
                     summary.innerHTML = '';
                     summary.appendChild(newContainer);
+                    // Re-add copy buttons since we cloned nodes
+                    addCopyButtons();
                 }
             });
         });

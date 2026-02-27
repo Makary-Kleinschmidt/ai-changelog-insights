@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-02-27
+
+### Fixed
+- **Empty Content Issue**: Switched primary model to `gemini-2.0-flash` due to `gemini-3-flash-preview` quota exhaustion.
+- **UI Visibility**: Fixed an issue where code snippets were not fully visible inside accordions by adding dynamic height adjustment logic.
+- **Copy Button**: Fixed the "Copy" button functionality to correctly copy code without including the button text and improved feedback animation.
+
 ## [1.2.0] - 2026-02-26
 
 ### Fixed
