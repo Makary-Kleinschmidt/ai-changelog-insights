@@ -15,13 +15,13 @@ GEMINI_FALLBACK_MODELS = [
     "gemini-3-flash-preview",
     "gemini-2.5-flash",
     "gemini-2.0-flash",
-    "gemini-1.5-flash"
+    "gemini-1.5-flash",
 ]
 RATE_LIMIT_DELAY = 12  # seconds between calls (5 RPM limit)
-DAILY_LIMIT = 20       # max 20 requests per day
-MAX_RETRIES = 2        # retries per model for 503/429/504 errors
-RETRY_DELAY = 30       # seconds to wait before retry on 503
-GEMINI_TIMEOUT = 60    # seconds before timing out an API call
+DAILY_LIMIT = 20  # max 20 requests per day
+MAX_RETRIES = 2  # retries per model for 503/429/504 errors
+RETRY_DELAY = 30  # seconds to wait before retry on 503
+GEMINI_TIMEOUT = 60  # seconds before timing out an API call
 MAX_OUTPUT_TOKENS = 16000  # prevent JSON truncation on complex responses
 
 GH_ACCESS_TOKEN = os.getenv("GH_ACCESS_TOKEN")
@@ -39,7 +39,6 @@ VIP_REPOS = [
     "crewAIInc/crewAI",
     "agno-agi/agno",
     "infiniflow/ragflow",
-
     # Models & Inference
     "ollama/ollama",
     "vllm-project/vllm",
@@ -48,27 +47,23 @@ VIP_REPOS = [
     "huggingface/peft",
     "huggingface/diffusers",
     "pytorch/pytorch",
-    
     # SDKs
     "anthropics/anthropic-sdk-python",
     "google/generative-ai-python",
     "openai/openai-python",
-    
     # Tools & UI
     "open-webui/open-webui",
     "AUTOMATIC1111/stable-diffusion-webui",
     "Comfy-Org/ComfyUI",
     "gradio-app/gradio",
     "streamlit/streamlit",
-    
     # Vector DBs & Data
     "chroma-core/chroma",
     "qdrant/qdrant",
     "huggingface/datasets",
-    
     # Audio/Video/Other
     "openai/whisper",
-    "ultralytics/ultralytics"
+    "ultralytics/ultralytics",
 ]
 
 # Actionable Insights Prompt
@@ -170,4 +165,3 @@ Output Format (JSON):
   "ecosystem_summary": "Today's updates focus heavily on agentic workflows..."
 }}
 """
-

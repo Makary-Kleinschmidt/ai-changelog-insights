@@ -38,10 +38,10 @@ jobs:
         run: |
           # If manual input provided, use it
           if [ "${{ inputs.target_date }}" != "" ]; then
-             uv run src/main.py --date "${{ inputs.target_date }}"
+             uv run python -m src.main --date "${{ inputs.target_date }}"
           else
              # Default behavior (current UTC date, which at 23:55 is "today")
-             uv run src/main.py
+             uv run python -m src.main
           fi
           
       - name: Deploy to GitHub Pages
